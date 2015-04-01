@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Twear</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_logged">LoggedActivity</string>
+    <string name="logged_in_static">You\'re logged in as:</string>
+</resources>
