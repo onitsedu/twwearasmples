@@ -16,9 +16,9 @@
 
 <resources>
 
-    <string name="app_name">GridViewPager Sample</string>
-    <string name="welcome_title">GridViewPager</string>
-    <string name="welcome_text">Sample App</string>
+    <string name="app_name">Twear</string>
+    <string name="welcome_title">Twear</string>
+    <string name="welcome_text">Twear</string>
 
     <string name="about_title">About</string>
     <string name="about_text">Content is organized into multiple pages. Swipe between cards to view other content.</string>
