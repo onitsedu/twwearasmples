@@ -7,6 +7,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -19,14 +20,9 @@ import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.Wearable;
-import com.twitter.sdk.android.core.Callback;
-import com.twitter.sdk.android.core.Result;
 import com.twitter.sdk.android.core.TwitterApiClient;
-import com.twitter.sdk.android.core.TwitterException;
 import com.twitter.sdk.android.core.TwitterSession;
 import com.twitter.sdk.android.core.models.Tweet;
-
-import java.util.List;
 
 import onitsuma.com.twear.R;
 import onitsuma.com.twear.singleton.TwearSingleton;
@@ -47,7 +43,7 @@ public class LoggedActivity extends ActionBarActivity implements DataApi.DataLis
     private final String TWEET_TEXT = "body";
     private final String TWEET_IMAGE = "image";
 
-    private final String MESSAGE_GIMMIE_TWEETS = "gimmie";
+    private final String PATH_GIMMIE_TWEETS = "/gimmie";
     private final String SEND_TWEETS_PATH = "/tweets";
 
     private TwitterApiClient mTwClient;
@@ -125,10 +121,15 @@ public class LoggedActivity extends ActionBarActivity implements DataApi.DataLis
     @Override
     public void onMessageReceived(MessageEvent messageEvent) {
         Log.d("LoggedActivity", "message received");
-        if (messageEvent.getPath().equals(MESSAGE_GIMMIE_TWEETS)) {
-            Callback<List<Tweet>> callbackTweets = new Callback<List<Tweet>>() {
+        if (messageEvent.getPath().equals(PATH_GIMMIE_TWEETS)) {
+
+            Toast.makeText(this, "MESSAGE RECEIVED", Toast.LENGTH_LONG);
+        }
+          /*  Callback<List<Tweet>> callbackTweets = new Callback<List<Tweet>>() {
                 @Override
                 public void success(Result<List<Tweet>> listResult) {
+
+
                     TextView tweet = null;
                     //List<DataMap> dataTweets = new ArrayList<>();
                     for (Tweet tuit : listResult.data) {
@@ -146,7 +147,7 @@ public class LoggedActivity extends ActionBarActivity implements DataApi.DataLis
                 }
             };
             mTwClient.getStatusesService().homeTimeline(50, null, null, null, null, null, null, callbackTweets);
-        }
+        }*/
     }
 
     @Override

@@ -50,15 +50,18 @@ public class SampleGridPagerAdapter extends FragmentGridPagerAdapter {
 
     private ColorDrawable mClearBg;
 
+
     public SampleGridPagerAdapter(Context ctx, FragmentManager fm, List<Row> mRows) {
         super(fm);
         mContext = ctx;
-
-
         this.mRows = mRows;
-
         mDefaultBg = new ColorDrawable(R.color.dark_grey);
         mClearBg = new ColorDrawable(android.R.color.transparent);
+    }
+
+
+    public void addRow(Row row) {
+        mRows.add(row);
     }
 
     LruCache<Integer, Drawable> mRowBackgrounds = new LruCache<Integer, Drawable>(3) {
@@ -126,7 +129,7 @@ public class SampleGridPagerAdapter extends FragmentGridPagerAdapter {
 
     @Override
     public Drawable getBackgroundForRow(final int row) {
-        return mRowBackgrounds.get(row);
+        return mRowBackgrounds.get(row % 5);
     }
 
     @Override

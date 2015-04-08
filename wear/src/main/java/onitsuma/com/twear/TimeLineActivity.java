@@ -7,9 +7,20 @@ import android.os.Bundle;
 import android.support.wearable.view.CardFragment;
 import android.support.wearable.view.DotsPageIndicator;
 import android.support.wearable.view.GridViewPager;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowInsets;
-import android.widget.TextView;
+
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.wearable.DataApi;
+import com.google.android.gms.wearable.DataEventBuffer;
+import com.google.android.gms.wearable.MessageApi;
+import com.google.android.gms.wearable.MessageEvent;
+import com.google.android.gms.wearable.Node;
+import com.google.android.gms.wearable.NodeApi;
+import com.google.android.gms.wearable.Wearable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,9 +28,14 @@ import java.util.List;
 import onitsuma.com.twear.adapter.Row;
 import onitsuma.com.twear.adapter.SampleGridPagerAdapter;
 
-public class TimeLineActivity extends Activity {
+public class TimeLineActivity extends Activity implements
+        DataApi.DataListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, MessageApi.MessageListener {
 
-    private TextView mTextView;
+
+    private GoogleApiClient mGoogleApiClient;
+
+    private final String PATH_GIMMIE_TWEETS = "/gimmie";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,12 +63,25 @@ public class TimeLineActivity extends Activity {
             }
         });
 
-        List<Row> mRows = new ArrayList<Row>();
-        fakeRows(mRows);
+        List<Row> mRows = new ArrayList<>();
+        // fakeRows(mRows);
 
-        pager.setAdapter(new SampleGridPagerAdapter(this, getFragmentManager(), mRows));
+        SampleGridPagerAdapter pagerAdapter = new SampleGridPagerAdapter(this, getFragmentManager(), mRows);
+
+        pager.setAdapter(pagerAdapter);
         DotsPageIndicator dotsPageIndicator = (DotsPageIndicator) findViewById(R.id.page_indicator);
         dotsPageIndicator.setPager(pager);
+
+        Log.d("TWEAR", "on create");
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addApi(Wearable.API)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .build();
+        Log.d("TWEAR", mGoogleApiClient.toString());
+
+        sendMessageToWearable(PATH_GIMMIE_TWEETS);
+
     }
 
     private void fakeRows(List<Row> mRows) {
@@ -77,4 +106,43 @@ public class TimeLineActivity extends Activity {
         return fragment;
     }
 
+    @Override
+    public void onConnected(Bundle bundle) {
+        Wearable.DataApi.addListener(mGoogleApiClient, this);
+        Wearable.MessageApi.addListener(mGoogleApiClient, this);
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onDataChanged(DataEventBuffer dataEvents) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+
+    }
+
+    private void sendMessageToWearable(final String path) {
+        Wearable.NodeApi.getConnectedNodes(mGoogleApiClient).setResultCallback(
+                new ResultCallback<NodeApi.GetConnectedNodesResult>() {
+                    @Override
+                    public void onResult(NodeApi.GetConnectedNodesResult nodes) {
+                        for (Node node : nodes.getNodes()) {
+                            Log.d("Send Message", "get tweets");
+                            Wearable.MessageApi.sendMessage(mGoogleApiClient, node.getId(), path, null);
+
+                        }
+                    }
+                });
+    }
+
+    @Override
+    public void onMessageReceived(MessageEvent messageEvent) {
+
+    }
 }
