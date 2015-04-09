@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.wearable.view.CardFragment;
 import android.support.wearable.view.DotsPageIndicator;
 import android.support.wearable.view.GridViewPager;
@@ -13,9 +14,9 @@ import android.view.WindowInsets;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.wearable.DataApi;
 import com.google.android.gms.wearable.DataEventBuffer;
+import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.MessageApi;
 import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.Node;
@@ -28,19 +29,32 @@ import java.util.List;
 import onitsuma.com.twear.adapter.Row;
 import onitsuma.com.twear.adapter.SampleGridPagerAdapter;
 
-public class TimeLineActivity extends Activity implements
-        DataApi.DataListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, MessageApi.MessageListener {
+public class TimeLineActivity extends Activity implements GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener, DataApi.DataListener, MessageApi.MessageListener,
+        NodeApi.NodeListener {
 
+
+    private static final String START_ACTIVITY_PATH = "/start-activity-twear";
+    private static final String SEND_TWEETS_PATH = "/send-tweets-twear";
+    private static final String TAG = "TLWearActivity";
 
     private GoogleApiClient mGoogleApiClient;
+    private SampleGridPagerAdapter pagerAdapter;
 
-    private final String PATH_GIMMIE_TWEETS = "/gimmie";
-
+    private Handler mHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_time_line);
+
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addApi(Wearable.API)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .build();
+
+        mHandler = new Handler();
         final Resources res = getResources();
         final GridViewPager pager = (GridViewPager) findViewById(R.id.pager);
         pager.setOnApplyWindowInsetsListener(new View.OnApplyWindowInsetsListener() {
@@ -66,40 +80,21 @@ public class TimeLineActivity extends Activity implements
         List<Row> mRows = new ArrayList<>();
         // fakeRows(mRows);
 
-        SampleGridPagerAdapter pagerAdapter = new SampleGridPagerAdapter(this, getFragmentManager(), mRows);
+        pagerAdapter = new SampleGridPagerAdapter(this, getFragmentManager());
 
         pager.setAdapter(pagerAdapter);
         DotsPageIndicator dotsPageIndicator = (DotsPageIndicator) findViewById(R.id.page_indicator);
         dotsPageIndicator.setPager(pager);
-
-        Log.d("TWEAR", "on create");
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .addApi(Wearable.API)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .build();
-        Log.d("TWEAR", mGoogleApiClient.toString());
-
-        sendMessageToWearable(PATH_GIMMIE_TWEETS);
-
     }
 
-    private void fakeRows(List<Row> mRows) {
-        mRows.add(new Row(cardFragment(R.string.welcome_title, R.string.welcome_text)));
-        mRows.add(new Row(cardFragment(R.string.about_title, R.string.about_text)));
-        mRows.add(new Row(
-                cardFragment(R.string.cards_title, R.string.cards_text),
-                cardFragment(R.string.expansion_title, R.string.expansion_text)));
-        mRows.add(new Row(
-                cardFragment(R.string.backgrounds_title, R.string.backgrounds_text),
-                cardFragment(R.string.columns_title, R.string.columns_text)));
-        mRows.add(new Row(cardFragment(R.string.dismiss_title, R.string.dismiss_text)));
+    private void sendGiveMeTweetsMessage() {
     }
 
-    private Fragment cardFragment(int titleRes, int textRes) {
+
+    private Fragment cardFragment(String title, String text) {
         Resources res = this.getResources();
         CardFragment fragment =
-                CardFragment.create(res.getText(titleRes), res.getText(textRes));
+                CardFragment.create(title, text);
         // Add some extra bottom margin to leave room for the page indicator
         fragment.setCardMarginBottom(
                 res.getDimensionPixelSize(R.dimen.card_margin_bottom));
@@ -107,42 +102,69 @@ public class TimeLineActivity extends Activity implements
     }
 
     @Override
-    public void onConnected(Bundle bundle) {
-        Wearable.DataApi.addListener(mGoogleApiClient, this);
-        Wearable.MessageApi.addListener(mGoogleApiClient, this);
+    protected void onResume() {
+        super.onResume();
+        mGoogleApiClient.connect();
     }
 
     @Override
-    public void onConnectionSuspended(int i) {
-
+    public void onConnected(Bundle connectionHint) {
+        LOGD(TAG, "onConnected(): Successfully connected to Google API client");
+        Wearable.DataApi.addListener(mGoogleApiClient, this);
+        Wearable.MessageApi.addListener(mGoogleApiClient, this);
+        Wearable.NodeApi.addListener(mGoogleApiClient, this);
     }
+
+    @Override
+    public void onConnectionSuspended(int cause) {
+        LOGD(TAG, "onConnectionSuspended(): Connection to Google API client was suspended");
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult result) {
+        Log.e(TAG, "onConnectionFailed(): Failed to connect, with result: " + result);
+    }
+
 
     @Override
     public void onDataChanged(DataEventBuffer dataEvents) {
-
-    }
-
-    @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
-
-    }
-
-    private void sendMessageToWearable(final String path) {
-        Wearable.NodeApi.getConnectedNodes(mGoogleApiClient).setResultCallback(
-                new ResultCallback<NodeApi.GetConnectedNodesResult>() {
-                    @Override
-                    public void onResult(NodeApi.GetConnectedNodesResult nodes) {
-                        for (Node node : nodes.getNodes()) {
-                            Log.d("Send Message", "get tweets");
-                            Wearable.MessageApi.sendMessage(mGoogleApiClient, node.getId(), path, null);
-
-                        }
-                    }
-                });
+        LOGD(TAG, "onDataChanged: " + dataEvents);
     }
 
     @Override
     public void onMessageReceived(MessageEvent messageEvent) {
-
+        LOGD(TAG, "onMessageReceived: " + messageEvent);
+        DataMap map = DataMap.fromByteArray(messageEvent.getData());
+        if (messageEvent.getPath().equals(SEND_TWEETS_PATH)) {
+            addNewRow(new Row(cardFragment(map.getString("user"), map.getString("text"))));
+        }
     }
+
+    private void addNewRow(final Row row) {
+        Runnable addRowView = new Runnable() {
+            @Override
+            public void run() {
+                pagerAdapter.addRow(row);
+                pagerAdapter.notifyDataSetChanged();
+            }
+        };
+        runOnUiThread(addRowView);
+    }
+
+
+    public void onPeerConnected(Node peer) {
+        LOGD(TAG, "onPeerConnected: " + peer);
+    }
+
+    @Override
+    public void onPeerDisconnected(Node peer) {
+        LOGD(TAG, "onPeerDisconnected: " + peer);
+    }
+
+    public static void LOGD(final String tag, String message) {
+        if (Log.isLoggable(tag, Log.DEBUG)) {
+            Log.d(tag, message);
+        }
+    }
+
 }

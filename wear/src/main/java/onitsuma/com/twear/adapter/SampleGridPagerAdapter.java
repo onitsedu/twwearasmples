@@ -29,6 +29,7 @@ import android.support.wearable.view.FragmentGridPagerAdapter;
 import android.support.wearable.view.GridPagerAdapter;
 import android.util.Log;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import onitsuma.com.twear.R;
@@ -51,10 +52,10 @@ public class SampleGridPagerAdapter extends FragmentGridPagerAdapter {
     private ColorDrawable mClearBg;
 
 
-    public SampleGridPagerAdapter(Context ctx, FragmentManager fm, List<Row> mRows) {
+    public SampleGridPagerAdapter(Context ctx, FragmentManager fm) {
         super(fm);
         mContext = ctx;
-        this.mRows = mRows;
+        this.mRows = new ArrayList<>();
         mDefaultBg = new ColorDrawable(R.color.dark_grey);
         mClearBg = new ColorDrawable(android.R.color.transparent);
     }
