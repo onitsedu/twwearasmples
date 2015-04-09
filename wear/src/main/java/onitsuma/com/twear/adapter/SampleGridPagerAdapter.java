@@ -65,6 +65,27 @@ public class SampleGridPagerAdapter extends FragmentGridPagerAdapter {
         mRows.add(row);
     }
 
+    /*LruCache<Integer, Drawable> mRowBackgrounds = new LruCache<Integer, Drawable>(3) {
+        @Override
+        protected Drawable create(final Integer row) {
+            int resid = BG_IMAGES[row % BG_IMAGES.length];
+            new DrawableLoadingTask(mContext) {
+                @Override
+                protected void onPostExecute(Drawable result) {
+                    TransitionDrawable background = new TransitionDrawable(new Drawable[]{
+                            mDefaultBg,
+                            result
+                    });
+                    mRowBackgrounds.put(row, background);
+                    notifyRowBackgroundChanged(row);
+                    background.startTransition(TRANSITION_DURATION_MILLIS);
+                }
+            }.execute(resid);
+            return mDefaultBg;
+        }
+    };*/
+
+
     LruCache<Integer, Drawable> mRowBackgrounds = new LruCache<Integer, Drawable>(3) {
         @Override
         protected Drawable create(final Integer row) {
@@ -130,7 +151,7 @@ public class SampleGridPagerAdapter extends FragmentGridPagerAdapter {
 
     @Override
     public Drawable getBackgroundForRow(final int row) {
-        return mRowBackgrounds.get(row % 5);
+        return mRowBackgrounds.get(row % 4);
     }
 
     @Override

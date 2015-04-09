@@ -69,6 +69,9 @@ public class LoggedActivity extends ActionBarActivity implements DataApi.DataLis
     private static final String START_ACTIVITY_PATH = "/start-activity-twear";
     private static final String SEND_TWEETS_PATH = "/send-tweets-twear";
 
+    private static final String RETRIEVE_TWEETS_PATH = "/twear-retrieve-tweets";
+
+
     private TwitterApiClient mTwClient;
 
     private List<Tuit> mTuits;
@@ -247,6 +250,12 @@ public class LoggedActivity extends ActionBarActivity implements DataApi.DataLis
     public void onMessageReceived(MessageEvent messageEvent) {
         LOGD(TAG, "onMessageReceived() A message from watch was received:" + messageEvent
                 .getRequestId() + " " + messageEvent.getPath());
+
+        if (messageEvent.getPath().equals(RETRIEVE_TWEETS_PATH)) {
+            new SendTweetsWearableActivityTask(mTuits).execute();
+        }
+
+
     }
 
     @Override

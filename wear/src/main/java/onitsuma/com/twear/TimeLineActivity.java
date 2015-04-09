@@ -28,6 +28,8 @@ import java.util.List;
 
 import onitsuma.com.twear.adapter.Row;
 import onitsuma.com.twear.adapter.SampleGridPagerAdapter;
+import onitsuma.com.twear.fragment.FragmentImageView;
+import onitsuma.com.twear.task.RequestTweetsActivityTask;
 
 public class TimeLineActivity extends Activity implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, DataApi.DataListener, MessageApi.MessageListener,
@@ -42,6 +44,8 @@ public class TimeLineActivity extends Activity implements GoogleApiClient.Connec
     private SampleGridPagerAdapter pagerAdapter;
 
     private Handler mHandler;
+
+    private boolean requestTweets;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,6 +89,8 @@ public class TimeLineActivity extends Activity implements GoogleApiClient.Connec
         pager.setAdapter(pagerAdapter);
         DotsPageIndicator dotsPageIndicator = (DotsPageIndicator) findViewById(R.id.page_indicator);
         dotsPageIndicator.setPager(pager);
+        requestTweets = true;
+
     }
 
     private void sendGiveMeTweetsMessage() {
@@ -113,6 +119,10 @@ public class TimeLineActivity extends Activity implements GoogleApiClient.Connec
         Wearable.DataApi.addListener(mGoogleApiClient, this);
         Wearable.MessageApi.addListener(mGoogleApiClient, this);
         Wearable.NodeApi.addListener(mGoogleApiClient, this);
+        if (requestTweets) {
+            requestTweets = false;
+            new RequestTweetsActivityTask(mGoogleApiClient).execute(10);
+        }
     }
 
     @Override
@@ -136,7 +146,12 @@ public class TimeLineActivity extends Activity implements GoogleApiClient.Connec
         LOGD(TAG, "onMessageReceived: " + messageEvent);
         DataMap map = DataMap.fromByteArray(messageEvent.getData());
         if (messageEvent.getPath().equals(SEND_TWEETS_PATH)) {
-            addNewRow(new Row(cardFragment(map.getString("user"), map.getString("text"))));
+            if (map.getByteArray("image") != null) {
+                FragmentImageView imageFragment = new FragmentImageView(map.getByteArray("image"));
+                addNewRow(new Row(cardFragment(map.getString("user"), map.getString("text")), imageFragment));
+            } else {
+                addNewRow(new Row(cardFragment(map.getString("user"), map.getString("text"))));
+            }
         }
     }
 
