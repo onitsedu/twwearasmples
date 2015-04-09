@@ -1,10 +1,8 @@
 package onitsuma.com.twear.activity;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
-import android.view.Menu;
-import android.view.MenuItem;
 
 import com.twitter.sdk.android.Twitter;
 import com.twitter.sdk.android.core.Callback;
@@ -19,7 +17,7 @@ import onitsuma.com.twear.R;
 import onitsuma.com.twear.singleton.TwearSingleton;
 
 
-public class SignInActivity extends ActionBarActivity {
+public class SignInActivity extends Activity {
 
     // Note: Your consumer key and secret should be obfuscated in your source code before shipping.
     private static final String TWITTER_KEY = "CrUzsu1kcZiL6NZstxRNRwHSv";
@@ -31,6 +29,14 @@ public class SignInActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         TwitterAuthConfig authConfig = new TwitterAuthConfig(TWITTER_KEY, TWITTER_SECRET);
         Fabric.with(this, new Twitter(authConfig));
+
+        TwitterSession twSession = Twitter.getSessionManager().getActiveSession();
+
+        if (twSession != null) {
+            TwearSingleton.INSTANCE.setTwSession(twSession);
+            Intent intent = new Intent(getApplicationContext(), LoggedActivity.class);
+            startActivity(intent);
+        }
         setContentView(R.layout.activity_sign_in);
         loginButton = (TwitterLoginButton) findViewById(R.id.twitter_login_button);
         loginButton.setCallback(new Callback<TwitterSession>() {
@@ -57,25 +63,4 @@ public class SignInActivity extends ActionBarActivity {
         loginButton.onActivityResult(requestCode, resultCode, data);
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_sign_in, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
 }

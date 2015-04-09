@@ -2,8 +2,6 @@ package onitsuma.com.twear.utils;
 
 import android.graphics.Bitmap;
 
-import com.google.android.gms.wearable.Asset;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.text.ParseException;
@@ -29,12 +27,15 @@ public class TwearUtils {
         return ret;
     }
 
-    public static Asset toAsset(Bitmap bitmap) {
+    public static byte[] toByteArray(Bitmap bitmap) {
+        if (bitmap == null) {
+            return null;
+        }
         ByteArrayOutputStream byteStream = null;
         try {
             byteStream = new ByteArrayOutputStream();
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteStream);
-            return Asset.createFromBytes(byteStream.toByteArray());
+            return byteStream.toByteArray();
         } finally {
             if (null != byteStream) {
                 try {

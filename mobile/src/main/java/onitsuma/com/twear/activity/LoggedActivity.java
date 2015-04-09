@@ -1,5 +1,8 @@
 package onitsuma.com.twear.activity;
 
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -23,6 +26,7 @@ import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.Wearable;
+import com.twitter.sdk.android.Twitter;
 import com.twitter.sdk.android.core.Callback;
 import com.twitter.sdk.android.core.Result;
 import com.twitter.sdk.android.core.TwitterApiClient;
@@ -30,6 +34,10 @@ import com.twitter.sdk.android.core.TwitterException;
 import com.twitter.sdk.android.core.TwitterSession;
 import com.twitter.sdk.android.core.models.Tweet;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -95,10 +103,6 @@ public class LoggedActivity extends ActionBarActivity implements DataApi.DataLis
                     buttonTweet.setTextColor(Color.parseColor("#000000"));
                     buttonTweet.setText(tweet.user.name + "\n" + tweet.text + "\n" + TwearUtils.parseTwitterDate(tweet.createdAt).getTime() + "\n");
 
-                   /*
-                   TEST LOAD IMAGES ASYNC
-                    */
-
                     timelineLayout.addView(buttonTweet);
 
                     addTuit(parseTuit(tweet));
@@ -134,35 +138,54 @@ public class LoggedActivity extends ActionBarActivity implements DataApi.DataLis
         mTuits.add(tuit);
     }
 
-    private Tuit parseTuit(Tweet tweet) {
-        Tuit tuit = new Tuit();
-        tuit.setText(tweet.text);
-        tuit.setUserName(tweet.user.name);
-        tuit.setTimestamp(TwearUtils.parseTwitterDate(tweet.createdAt).getTime());
-       /* Bitmap bm = null;
-        String imageUrl = null;
+    private Tuit parseTuit(final Tweet tweet) {
+
+        String imageUrlString = null;
         if (tweet.entities.media != null && tweet.entities.media.size() > 0) {
-            imageUrl = tweet.entities.media.get(0).mediaUrl;
-        } else {
-            imageUrl = tweet.user.profileImageUrlHttps;
+            imageUrlString = tweet.entities.media.get(0).mediaUrl;
         }
+        /*else {
+            imageUrlString = tweet.user.profileImageUrlHttps;
+        }*/
+
+        URL imageUrl = null;
         try {
-            bm = BitmapFactory.decodeStream((InputStream) new URL(imageUrl).getContent());
-        } catch (IOException e) {
-            Log.e("ERROR", "URI ERROR");
-            return tuit;
+            imageUrl = imageUrlString != null ? new URL(imageUrlString) : null;
+        } catch (MalformedURLException e) {
+            //TODO handle exception
+            e.printStackTrace();
         }
-        tuit.setAsset(TwearUtils.toAsset(bm));*/
+        final Tuit tuit = new Tuit();
+        new BitmapLoadingTask() {
+
+            @Override
+            protected void onPostExecute(byte[] image) {
+                tuit.setText(tweet.text);
+                tuit.setUserName(tweet.user.name);
+                tuit.setTimestamp(TwearUtils.parseTwitterDate(tweet.createdAt).getTime());
+                tuit.setImage(image);
+            }
+        }.execute(imageUrl);
         return tuit;
     }
 
-    private DataMap tweetToDataMap(Tweet tweet) {
-        DataMap map = new DataMap();
-        map.putString(TWEET_AUTHOR, tweet.user.name);
-        map.putString(TWEET_TEXT, tweet.text);
-        //TODO load image async
-        //map.putString(TWEET_IMAGE,tweet.user.profileImageUrl);
-        return map;
+
+    class BitmapLoadingTask extends AsyncTask<URL, Void, byte[]> {
+
+        @Override
+        protected byte[] doInBackground(URL... params) {
+            if (params[0] == null) {
+                return null;
+            }
+            Bitmap bm = null;
+            try {
+                bm = BitmapFactory.decodeStream((InputStream) params[0].getContent());
+            } catch (IOException e) {
+                Log.e("ERROR", "URL ERROR");
+                return null;
+            }
+            return TwearUtils.toByteArray(bm);
+        }
     }
 
     protected void enableSendTweetsButton() {
@@ -189,7 +212,11 @@ public class LoggedActivity extends ActionBarActivity implements DataApi.DataLis
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.settings_logout) {
+            TwearSingleton.INSTANCE.setTwSession(null);
+            Twitter.getSessionManager().clearActiveSession();
+            Intent intent = new Intent(getApplicationContext(), SignInActivity.class);
+            startActivity(intent);
             return true;
         }
 
@@ -324,6 +351,7 @@ public class LoggedActivity extends ActionBarActivity implements DataApi.DataLis
         data.putString("text", tuit.getText());
         data.putString("user", tuit.getUserName());
         data.putLong("timestamp", tuit.getTimestamp());
+        data.putByteArray("image", tuit.getImage());
         Wearable.MessageApi.sendMessage(
                 mGoogleApiClient, node, SEND_TWEETS_PATH, data.toByteArray()).setResultCallback(
                 new ResultCallback<MessageApi.SendMessageResult>() {

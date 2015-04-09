@@ -1,7 +1,5 @@
 package onitsuma.com.twear.model;
 
-import com.google.android.gms.wearable.Asset;
-
 /**
  * Created by csuay on 08/04/15.
  */
@@ -9,7 +7,8 @@ public class Tuit {
 
     private String userName;
     private String text;
-    private Asset asset;
+    private byte[] image;
+    private byte[] userImage;
     private long timestamp;
 
     public long getTimestamp() {
@@ -28,20 +27,29 @@ public class Tuit {
         this.text = text;
     }
 
-    public Asset getAsset() {
-        return asset;
-    }
-
-    public void setAsset(Asset asset) {
-        this.asset = asset;
-    }
-
     public String getUserName() {
         return userName;
     }
 
     public void setUserName(String userName) {
         this.userName = userName;
+    }
+
+
+    public byte[] getImage() {
+        return image;
+    }
+
+    public void setImage(byte[] image) {
+        this.image = image;
+    }
+
+    public byte[] getUserImage() {
+        return userImage;
+    }
+
+    public void setUserImage(byte[] userImage) {
+        this.userImage = userImage;
     }
 
 }
