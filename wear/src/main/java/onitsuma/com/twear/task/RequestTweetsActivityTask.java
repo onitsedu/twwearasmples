@@ -11,12 +11,10 @@ import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.Wearable;
 
-import java.util.HashSet;
-
 /**
  * Created by csuay on 09/04/15.
  */
-public class RequestTweetsActivityTask extends AsyncTask<Integer, Void, Void> {
+public class RequestTweetsActivityTask extends AsyncTask<Long, Void, Void> {
 
     private static final String TAG = "ReqTweets";
     private GoogleApiClient mGoogleApiClient;
@@ -27,11 +25,12 @@ public class RequestTweetsActivityTask extends AsyncTask<Integer, Void, Void> {
     }
 
     @Override
-    protected Void doInBackground(Integer... params) {
+    protected Void doInBackground(Long... params) {
 
         DataMap map = new DataMap();
-        map.putInt("offset", params[0]);
-        HashSet<String> results = new HashSet<String>();
+        map.putInt("offset", params[0].intValue());
+        map.putLong("maxId", params[1].longValue());
+
         NodeApi.GetConnectedNodesResult nodes =
                 Wearable.NodeApi.getConnectedNodes(mGoogleApiClient).await();
 

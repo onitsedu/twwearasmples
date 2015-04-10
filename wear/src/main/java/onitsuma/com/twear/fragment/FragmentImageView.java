@@ -13,22 +13,19 @@ import android.widget.ImageView;
 
 import onitsuma.com.twear.R;
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link FragmentImageView.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link FragmentImageView#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class FragmentImageView extends Fragment {
 
     private final static String TAG = "FragmentImgVw";
     ImageView imageView;
     byte[] mImage;
 
-    public FragmentImageView(byte[] image) {
-        this.mImage = image;
+    public FragmentImageView() {
+    }
+
+    @Override
+    public void setArguments(Bundle args) {
+        super.setArguments(args);
+        mImage = args.getByteArray("image");
     }
 
     @Override

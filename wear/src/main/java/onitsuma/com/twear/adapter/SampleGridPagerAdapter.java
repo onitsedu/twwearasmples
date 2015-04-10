@@ -29,10 +29,11 @@ import android.support.wearable.view.FragmentGridPagerAdapter;
 import android.support.wearable.view.GridPagerAdapter;
 import android.util.Log;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collections;
 
 import onitsuma.com.twear.R;
+import onitsuma.com.twear.model.TweetRow;
+import onitsuma.com.twear.singleton.TwearWearableSingleton;
 
 /**
  * Constructs fragments as requested by the GridViewPager. For each row a different background is
@@ -46,23 +47,24 @@ public class SampleGridPagerAdapter extends FragmentGridPagerAdapter {
     private static final int TRANSITION_DURATION_MILLIS = 100;
 
     private final Context mContext;
-    private List<Row> mRows;
     private ColorDrawable mDefaultBg;
 
     private ColorDrawable mClearBg;
+    private TwearWearableSingleton twSingleton;
 
 
     public SampleGridPagerAdapter(Context ctx, FragmentManager fm) {
         super(fm);
         mContext = ctx;
-        this.mRows = new ArrayList<>();
         mDefaultBg = new ColorDrawable(R.color.dark_grey);
         mClearBg = new ColorDrawable(android.R.color.transparent);
+        twSingleton = TwearWearableSingleton.INSTANCE;
     }
 
 
-    public void addRow(Row row) {
-        mRows.add(row);
+    public void addRow(TweetRow row) {
+        twSingleton.addRow(row);
+        Collections.sort(twSingleton.getRows(), new TweetRow());
     }
 
     /*LruCache<Integer, Drawable> mRowBackgrounds = new LruCache<Integer, Drawable>(3) {
@@ -145,7 +147,7 @@ public class SampleGridPagerAdapter extends FragmentGridPagerAdapter {
 
     @Override
     public Fragment getFragment(int row, int col) {
-        Row adapterRow = mRows.get(row);
+        Row adapterRow = twSingleton.getRows().get(row).getTweetRow();
         return adapterRow.getColumn(col);
     }
 
@@ -161,12 +163,12 @@ public class SampleGridPagerAdapter extends FragmentGridPagerAdapter {
 
     @Override
     public int getRowCount() {
-        return mRows.size();
+        return twSingleton.getRows().size();
     }
 
     @Override
     public int getColumnCount(int rowNum) {
-        return mRows.get(rowNum).getColumnCount();
+        return twSingleton.getRows().get(rowNum).getTweetRow().getColumnCount();
     }
 
     class DrawableLoadingTask extends AsyncTask<Integer, Void, Drawable> {

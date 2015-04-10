@@ -31,13 +31,8 @@ public class SignInActivity extends Activity {
         TwitterAuthConfig authConfig = new TwitterAuthConfig(TWITTER_KEY, TWITTER_SECRET);
         Fabric.with(this, new Twitter(authConfig), new Crashlytics());
 
-        TwitterSession twSession = Twitter.getSessionManager().getActiveSession();
+        isTwConnected();
 
-        if (twSession != null) {
-            TwearSingleton.INSTANCE.setTwSession(twSession);
-            Intent intent = new Intent(getApplicationContext(), LoggedActivity.class);
-            startActivity(intent);
-        }
         setContentView(R.layout.activity_sign_in);
         loginButton = (TwitterLoginButton) findViewById(R.id.twitter_login_button);
         loginButton.setCallback(new Callback<TwitterSession>() {
@@ -59,9 +54,25 @@ public class SignInActivity extends Activity {
     }
 
     @Override
+    protected void onResume() {
+        isTwConnected();
+        super.onResume();
+    }
+
+    private void isTwConnected() {
+        TwitterSession twSession = Twitter.getSessionManager().getActiveSession();
+        if (twSession != null) {
+            TwearSingleton.INSTANCE.setTwSession(twSession);
+            Intent intent = new Intent(getApplicationContext(), LoggedActivity.class);
+            startActivity(intent);
+        }
+    }
+
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         loginButton.onActivityResult(requestCode, resultCode, data);
     }
+
 
 }

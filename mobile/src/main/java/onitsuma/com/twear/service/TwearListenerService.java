@@ -16,96 +16,173 @@
 
 package onitsuma.com.twear.service;
 
+import android.app.IntentService;
+import android.content.Intent;
+import android.os.Bundle;
 import android.util.Log;
 
+import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.wearable.DataApi;
 import com.google.android.gms.wearable.DataEventBuffer;
+import com.google.android.gms.wearable.MessageApi;
 import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.Node;
+import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.Wearable;
-import com.google.android.gms.wearable.WearableListenerService;
+import com.twitter.sdk.android.core.Callback;
+import com.twitter.sdk.android.core.Result;
+import com.twitter.sdk.android.core.TwitterApiClient;
+import com.twitter.sdk.android.core.TwitterException;
+import com.twitter.sdk.android.core.TwitterSession;
+import com.twitter.sdk.android.core.models.Tweet;
+
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+
+import onitsuma.com.twear.model.Tuit;
+import onitsuma.com.twear.singleton.TwearSingleton;
+import onitsuma.com.twear.task.BitmapLoadingTask;
+import onitsuma.com.twear.task.SendMessageAsyncTask;
+import onitsuma.com.twear.utils.TwearUtils;
 
 /**
- * Listens to DataItems and Messages from the local node.
+ * Listens to Messages from the Wearable node.
  */
-public class TwearListenerService extends WearableListenerService {
+public class TwearListenerService extends IntentService implements DataApi.DataListener,
+        MessageApi.MessageListener, NodeApi.NodeListener, GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener {
 
-    private static final String TAG = "DataLayerListenerServic";
+    private static final String TWEET_IMAGE = "image";
 
+    private static final String TAG = "LoggedActivity";
     private static final String START_ACTIVITY_PATH = "/start-activity-twear";
+    private static final String RETRIEVE_TWEETS_PATH = "/twear-retrieve-tweets";
     private static final String SEND_TWEETS_PATH = "/send-tweets-twear";
 
-    private static final String DATA_ITEM_RECEIVED_PATH = "/data-item-received";
-    public static final String COUNT_PATH = "/count";
-    public static final String IMAGE_PATH = "/image";
-    public static final String IMAGE_KEY = "photo";
-    private static final String COUNT_KEY = "count";
-    private static final int MAX_LOG_TAG_LENGTH = 23;
-    GoogleApiClient mGoogleApiClient;
+
+    private GoogleApiClient mGoogleApiClient;
+    private TwitterSession mTwSession;
+    private TwitterApiClient mTwClient;
+
+    public TwearListenerService() {
+        super("TwearListenerService");
+
+    }
+
 
     @Override
-    public void onCreate() {
-        super.onCreate();
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .addApi(Wearable.API)
-                .build();
-        mGoogleApiClient.connect();
+    public void onConnected(Bundle bundle) {
+        Wearable.DataApi.addListener(mGoogleApiClient, this);
+        Wearable.MessageApi.addListener(mGoogleApiClient, this);
+        Wearable.NodeApi.addListener(mGoogleApiClient, this);
+
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
     }
 
     @Override
     public void onDataChanged(DataEventBuffer dataEvents) {
-        /*LOGD(TAG, "onDataChanged: " + dataEvents);
-        final List<DataEvent> events = FreezableUtils.freezeIterable(dataEvents);
-        dataEvents.close();
-        if (!mGoogleApiClient.isConnected()) {
-            ConnectionResult connectionResult = mGoogleApiClient
-                    .blockingConnect(30, TimeUnit.SECONDS);
-            if (!connectionResult.isSuccess()) {
-                Log.e(TAG, "DataLayerListenerService failed to connect to GoogleApiClient.");
-                return;
-            }
-        }
 
-        // Loop through the events and send a message back to the node that created the data item.
-        for (DataEvent event : events) {
-            Uri uri = event.getDataItem().getUri();
-            String path = uri.getPath();
-            if (COUNT_PATH.equals(path)) {
-                // Get the node id of the node that created the data item from the host portion of
-                // the uri.
-                String nodeId = uri.getHost();
-                // Set the data of the message to be the bytes of the Uri.
-                byte[] payload = uri.toString().getBytes();
-
-                // Send the rpc
-                Wearable.MessageApi.sendMessage(mGoogleApiClient, nodeId, DATA_ITEM_RECEIVED_PATH,
-                        payload);
-            }
-        }*/
     }
 
     @Override
     public void onMessageReceived(MessageEvent messageEvent) {
-        LOGD(TAG, "onMessageReceived: " + messageEvent);
-
-        // Check to see if the message is to start an activity
-        if (messageEvent.getPath().equals(START_ACTIVITY_PATH)) {
+        LOGD(TAG, "onMessageReceived() A message from watch was received:" + messageEvent
+                .getRequestId() + " " + messageEvent.getPath());
+        if (messageEvent.getPath().equals(RETRIEVE_TWEETS_PATH)) {
+            sendTweetsToWearable();
         }
+
     }
 
     @Override
-    public void onPeerConnected(Node peer) {
-        LOGD(TAG, "onPeerConnected: " + peer);
+    public void onPeerConnected(Node node) {
+
     }
 
     @Override
-    public void onPeerDisconnected(Node peer) {
-        LOGD(TAG, "onPeerDisconnected: " + peer);
+    public void onPeerDisconnected(Node node) {
+
     }
 
-    public static void LOGD(final String tag, String message) {
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+        Wearable.DataApi.removeListener(mGoogleApiClient, this);
+        Wearable.MessageApi.removeListener(mGoogleApiClient, this);
+        Wearable.NodeApi.removeListener(mGoogleApiClient, this);
+    }
+
+
+    private void sendTweetsToWearable() {
+        Callback<List<Tweet>> twCallback = new Callback<List<Tweet>>() {
+            @Override
+            public void success(Result<List<Tweet>> listResult) {
+                List<Tuit> tuits = new ArrayList<>();
+                for (Tweet tweet : listResult.data) {
+                    tuits.add(parseTuit(tweet));
+                }
+                new SendMessageAsyncTask(mGoogleApiClient, tuits).execute();
+            }
+
+            @Override
+            public void failure(TwitterException e) {
+            }
+        };
+        mTwClient.getStatusesService().homeTimeline(10, null, null, null, null, null, null, twCallback);
+    }
+
+    private Tuit parseTuit(final Tweet tweet) {
+
+        String imageUrlString = null;
+        if (tweet.entities.media != null && tweet.entities.media.size() > 0) {
+            imageUrlString = tweet.entities.media.get(0).mediaUrl;
+        }
+        URL imageUrl = null;
+        try {
+            imageUrl = imageUrlString != null ? new URL(imageUrlString) : null;
+        } catch (MalformedURLException e) {
+            //TODO handle exception
+            e.printStackTrace();
+        }
+        final Tuit tuit = new Tuit();
+        new BitmapLoadingTask() {
+
+            @Override
+            protected void onPostExecute(byte[] image) {
+                tuit.setText(tweet.text);
+                tuit.setUserName(tweet.user.name);
+                tuit.setTimestamp(TwearUtils.parseTwitterDate(tweet.createdAt).getTime());
+                tuit.setId(tweet.id);
+                tuit.setImage(image);
+            }
+        }.execute(imageUrl);
+        return tuit;
+    }
+
+    private static void LOGD(final String tag, String message) {
         if (Log.isLoggable(tag, Log.DEBUG)) {
             Log.d(tag, message);
         }
+    }
+
+    @Override
+    protected void onHandleIntent(Intent intent) {
+        LOGD(TAG, "onHandleIntent");
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addApi(Wearable.API)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .build();
+
+        mTwSession = TwearSingleton.INSTANCE.getTwSession();
+        mTwClient = new TwitterApiClient(mTwSession);
+        mGoogleApiClient.connect();
+
     }
 }

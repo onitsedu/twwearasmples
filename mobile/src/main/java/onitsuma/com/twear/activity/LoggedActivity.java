@@ -1,8 +1,6 @@
 package onitsuma.com.twear.activity;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -34,8 +32,6 @@ import com.twitter.sdk.android.core.TwitterException;
 import com.twitter.sdk.android.core.TwitterSession;
 import com.twitter.sdk.android.core.models.Tweet;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -45,7 +41,9 @@ import java.util.List;
 
 import onitsuma.com.twear.R;
 import onitsuma.com.twear.model.Tuit;
+import onitsuma.com.twear.service.TwearListenerService;
 import onitsuma.com.twear.singleton.TwearSingleton;
+import onitsuma.com.twear.task.BitmapLoadingTask;
 import onitsuma.com.twear.utils.TwearUtils;
 
 public class LoggedActivity extends ActionBarActivity implements DataApi.DataListener,
@@ -87,6 +85,8 @@ public class LoggedActivity extends ActionBarActivity implements DataApi.DataLis
         loggedName = (TextView) findViewById(R.id.logged_in_name);
         loggedName.setText("  " + twSession.getUserName());
 
+        /* Init service*/
+
 
         timelineLayout = (LinearLayout) findViewById(R.id.timeline_layout);
         mGoogleApiClient = new GoogleApiClient.Builder(this)
@@ -96,6 +96,7 @@ public class LoggedActivity extends ActionBarActivity implements DataApi.DataLis
                 .build();
 
         mTwClient = new TwitterApiClient(twSession);
+
 
         Callback<List<Tweet>> twCallback = new Callback<List<Tweet>>() {
             @Override
@@ -131,6 +132,9 @@ public class LoggedActivity extends ActionBarActivity implements DataApi.DataLis
             }
         });
 
+
+        Intent intent = new Intent(this, TwearListenerService.class);
+        startService(intent);
 
     }
 
@@ -172,24 +176,6 @@ public class LoggedActivity extends ActionBarActivity implements DataApi.DataLis
         return tuit;
     }
 
-
-    class BitmapLoadingTask extends AsyncTask<URL, Void, byte[]> {
-
-        @Override
-        protected byte[] doInBackground(URL... params) {
-            if (params[0] == null) {
-                return null;
-            }
-            Bitmap bm = null;
-            try {
-                bm = BitmapFactory.decodeStream((InputStream) params[0].getContent());
-            } catch (IOException e) {
-                Log.e("ERROR", "URL ERROR");
-                return null;
-            }
-            return TwearUtils.toByteArray(bm);
-        }
-    }
 
     protected void enableSendTweetsButton() {
         if (tweetsAcquired && wearableConnected) {
@@ -251,9 +237,9 @@ public class LoggedActivity extends ActionBarActivity implements DataApi.DataLis
         LOGD(TAG, "onMessageReceived() A message from watch was received:" + messageEvent
                 .getRequestId() + " " + messageEvent.getPath());
 
-        if (messageEvent.getPath().equals(RETRIEVE_TWEETS_PATH)) {
+       /* if (messageEvent.getPath().equals(RETRIEVE_TWEETS_PATH)) {
             new SendTweetsWearableActivityTask(mTuits).execute();
-        }
+        }*/
 
 
     }

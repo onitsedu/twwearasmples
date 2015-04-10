@@ -10,6 +10,15 @@ public class Tuit {
     private byte[] image;
     private byte[] userImage;
     private long timestamp;
+    private long id;
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
 
     public long getTimestamp() {
         return timestamp;
