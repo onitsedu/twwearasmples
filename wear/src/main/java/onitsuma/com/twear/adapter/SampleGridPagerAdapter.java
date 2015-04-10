@@ -29,6 +29,7 @@ import android.support.wearable.view.FragmentGridPagerAdapter;
 import android.support.wearable.view.GridPagerAdapter;
 import android.util.Log;
 
+import java.util.ArrayList;
 import java.util.Collections;
 
 import onitsuma.com.twear.R;
@@ -59,6 +60,9 @@ public class SampleGridPagerAdapter extends FragmentGridPagerAdapter {
         mDefaultBg = new ColorDrawable(R.color.dark_grey);
         mClearBg = new ColorDrawable(android.R.color.transparent);
         twSingleton = TwearWearableSingleton.INSTANCE;
+        if (twSingleton.getRows() == null) {
+            twSingleton.setRows(new ArrayList<TweetRow>());
+        }
     }
 
 

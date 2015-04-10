@@ -29,7 +29,9 @@ public class RequestTweetsActivityTask extends AsyncTask<Long, Void, Void> {
 
         DataMap map = new DataMap();
         map.putInt("offset", params[0].intValue());
-        map.putLong("maxId", params[1].longValue());
+        if (params.length > 1) {
+            map.putLong("maxId", params[1].longValue());
+        }
 
         NodeApi.GetConnectedNodesResult nodes =
                 Wearable.NodeApi.getConnectedNodes(mGoogleApiClient).await();

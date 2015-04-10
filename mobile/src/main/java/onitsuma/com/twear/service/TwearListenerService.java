@@ -25,6 +25,7 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.wearable.DataApi;
 import com.google.android.gms.wearable.DataEventBuffer;
+import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.MessageApi;
 import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.Node;
@@ -95,8 +96,9 @@ public class TwearListenerService extends IntentService implements DataApi.DataL
     public void onMessageReceived(MessageEvent messageEvent) {
         LOGD(TAG, "onMessageReceived() A message from watch was received:" + messageEvent
                 .getRequestId() + " " + messageEvent.getPath());
+        DataMap map = DataMap.fromByteArray(messageEvent.getData());
         if (messageEvent.getPath().equals(RETRIEVE_TWEETS_PATH)) {
-            sendTweetsToWearable();
+            sendTweetsToWearable(map.getLong("maxId"));
         }
 
     }
@@ -119,7 +121,7 @@ public class TwearListenerService extends IntentService implements DataApi.DataL
     }
 
 
-    private void sendTweetsToWearable() {
+    private void sendTweetsToWearable(Long maxId) {
         Callback<List<Tweet>> twCallback = new Callback<List<Tweet>>() {
             @Override
             public void success(Result<List<Tweet>> listResult) {
@@ -134,7 +136,7 @@ public class TwearListenerService extends IntentService implements DataApi.DataL
             public void failure(TwitterException e) {
             }
         };
-        mTwClient.getStatusesService().homeTimeline(10, null, null, null, null, null, null, twCallback);
+        mTwClient.getStatusesService().homeTimeline(10, null, maxId, null, null, null, null, twCallback);
     }
 
     private Tuit parseTuit(final Tweet tweet) {

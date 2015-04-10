@@ -23,9 +23,6 @@ import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.Wearable;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import onitsuma.com.twear.adapter.Row;
 import onitsuma.com.twear.adapter.SampleGridPagerAdapter;
 import onitsuma.com.twear.fragment.FragmentImageView;
@@ -60,6 +57,7 @@ public class TimeLineActivity extends Activity implements GoogleApiClient.Connec
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .build();
+        mGoogleApiClient.connect();
 
         loading = (ProgressBar) findViewById(R.id.tweets_pb);
 
@@ -86,11 +84,7 @@ public class TimeLineActivity extends Activity implements GoogleApiClient.Connec
         });
 
 
-        List<Row> mRows = new ArrayList<>();
-        // fakeRows(mRows);
-
         pagerAdapter = new SampleGridPagerAdapter(this, getFragmentManager());
-
         pager.setAdapter(pagerAdapter);
         DotsPageIndicator dotsPageIndicator = (DotsPageIndicator) findViewById(R.id.page_indicator);
         dotsPageIndicator.setPager(pager);
@@ -140,7 +134,8 @@ public class TimeLineActivity extends Activity implements GoogleApiClient.Connec
     @Override
     protected void onResume() {
         super.onResume();
-        mGoogleApiClient.connect();
+        if (!mGoogleApiClient.isConnected())
+            mGoogleApiClient.connect();
     }
 
     @Override
