@@ -7,5 +7,6 @@
     <string name="logged_in_static">You\'re logged in as:</string>
 
     <string name="logout_settings">Logout</string>
+    <string name="title_activity_selector">SelectorActivity</string>
 
 </resources>

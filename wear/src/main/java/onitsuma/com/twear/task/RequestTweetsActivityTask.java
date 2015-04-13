@@ -11,26 +11,38 @@ import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.Wearable;
 
+import onitsuma.com.twear.singleton.TwearWearableSingleton;
+import onitsuma.com.twear.utils.TwearConstants;
+
 /**
  * Created by csuay on 09/04/15.
  */
-public class RequestTweetsActivityTask extends AsyncTask<Long, Void, Void> {
+public class RequestTweetsActivityTask extends AsyncTask<Long, Void, Void> implements TwearConstants {
 
     private static final String TAG = "ReqTweets";
     private GoogleApiClient mGoogleApiClient;
-    private static final String RETRIEVE_TWEETS_PATH = "/twear-retrieve-tweets";
 
-    public RequestTweetsActivityTask(GoogleApiClient googleApiClient) {
-        this.mGoogleApiClient = googleApiClient;
+    private Integer mOffset;
+    private Long mMaxId;
+    private Long mSinceId;
+
+    public RequestTweetsActivityTask(Integer offset, Long maxId, Long sinceId) {
+        this.mGoogleApiClient = TwearWearableSingleton.INSTANCE.getGoogleApiClient();
+        this.mOffset = offset;
+        this.mMaxId = maxId;
+        this.mSinceId = sinceId;
     }
 
     @Override
     protected Void doInBackground(Long... params) {
 
         DataMap map = new DataMap();
-        map.putInt("offset", params[0].intValue());
-        if (params.length > 1) {
-            map.putLong("maxId", params[1].longValue());
+        map.putInt(MESSAGE_OFFSET, mOffset);
+        if (mMaxId != null) {
+            map.putLong(MESSAGE_MAX_ID, mMaxId);
+        }
+        if (mSinceId != null) {
+            map.putLong(MESSAGE_SINCE_ID, mSinceId);
         }
 
         NodeApi.GetConnectedNodesResult nodes =

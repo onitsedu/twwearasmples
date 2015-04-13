@@ -1,0 +1,20 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context="onitsuma.com.twear.fragment.RetweetFragment">
+
+    <!-- TODO: Update blank fragment layout -->
+    <android.support.wearable.view.CircledImageView
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:id="@+id/retweet_round"
+        android:src="@drawable/retweet"
+        app:circle_color="@color/tw__blue_default"
+        app:circle_radius="35dp"
+        app:circle_radius_pressed="45dp"
+        android:layout_gravity="center" />
+
+
+</FrameLayout>

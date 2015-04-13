@@ -1,0 +1,17 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="onitsuma.com.twear.fragment.FavouriteFragment">
+
+    <android.support.wearable.view.CircledImageView
+        android:id="@+id/favorite_round"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:src="@drawable/favorite"
+        app:circle_color="@color/tw__blue_default"
+        app:circle_radius="45dp"
+        app:circle_radius_pressed="52dp"
+        android:layout_gravity="center" />
+</FrameLayout>

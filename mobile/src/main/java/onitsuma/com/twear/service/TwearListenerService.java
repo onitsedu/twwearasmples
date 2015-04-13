@@ -47,6 +47,7 @@ import onitsuma.com.twear.model.Tuit;
 import onitsuma.com.twear.singleton.TwearSingleton;
 import onitsuma.com.twear.task.BitmapLoadingTask;
 import onitsuma.com.twear.task.SendMessageAsyncTask;
+import onitsuma.com.twear.utils.TwearConstants;
 import onitsuma.com.twear.utils.TwearUtils;
 
 /**
@@ -54,14 +55,10 @@ import onitsuma.com.twear.utils.TwearUtils;
  */
 public class TwearListenerService extends IntentService implements DataApi.DataListener,
         MessageApi.MessageListener, NodeApi.NodeListener, GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener {
+        GoogleApiClient.OnConnectionFailedListener, TwearConstants {
 
-    private static final String TWEET_IMAGE = "image";
 
     private static final String TAG = "LoggedActivity";
-    private static final String START_ACTIVITY_PATH = "/start-activity-twear";
-    private static final String RETRIEVE_TWEETS_PATH = "/twear-retrieve-tweets";
-    private static final String SEND_TWEETS_PATH = "/send-tweets-twear";
 
 
     private GoogleApiClient mGoogleApiClient;
@@ -98,7 +95,7 @@ public class TwearListenerService extends IntentService implements DataApi.DataL
                 .getRequestId() + " " + messageEvent.getPath());
         DataMap map = DataMap.fromByteArray(messageEvent.getData());
         if (messageEvent.getPath().equals(RETRIEVE_TWEETS_PATH)) {
-            sendTweetsToWearable(map.getLong("maxId"));
+            sendTweetsToWearable(map.getLong("maxId") != 0 ? map.getLong("maxId") : null);
         }
 
     }
@@ -129,7 +126,12 @@ public class TwearListenerService extends IntentService implements DataApi.DataL
                 for (Tweet tweet : listResult.data) {
                     tuits.add(parseTuit(tweet));
                 }
-                new SendMessageAsyncTask(mGoogleApiClient, tuits).execute();
+                if (tuits.size() > 0) {
+                    new SendMessageAsyncTask(mGoogleApiClient, ACTION_SEND_TWEETS, tuits).execute();
+                } else {
+                    new SendMessageAsyncTask(mGoogleApiClient, ACTION_NO_TWEETS, null).execute();
+
+                }
             }
 
             @Override
@@ -168,9 +170,7 @@ public class TwearListenerService extends IntentService implements DataApi.DataL
     }
 
     private static void LOGD(final String tag, String message) {
-        if (Log.isLoggable(tag, Log.DEBUG)) {
-            Log.d(tag, message);
-        }
+        Log.d(tag, message);
     }
 
     @Override

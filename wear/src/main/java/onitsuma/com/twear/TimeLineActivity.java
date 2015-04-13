@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.wearable.view.CardFragment;
 import android.support.wearable.view.DotsPageIndicator;
 import android.support.wearable.view.GridViewPager;
@@ -25,24 +26,28 @@ import com.google.android.gms.wearable.Wearable;
 
 import onitsuma.com.twear.adapter.Row;
 import onitsuma.com.twear.adapter.SampleGridPagerAdapter;
+import onitsuma.com.twear.fragment.FavouriteFragment;
 import onitsuma.com.twear.fragment.FragmentImageView;
+import onitsuma.com.twear.fragment.LoadMoreFragment;
+import onitsuma.com.twear.fragment.RetweetFragment;
 import onitsuma.com.twear.model.TweetRow;
 import onitsuma.com.twear.singleton.TwearWearableSingleton;
 import onitsuma.com.twear.task.RequestTweetsActivityTask;
+import onitsuma.com.twear.utils.TwearConstants;
 
 public class TimeLineActivity extends Activity implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, DataApi.DataListener, MessageApi.MessageListener,
-        NodeApi.NodeListener {
+        NodeApi.NodeListener, TwearConstants {
 
 
-    private static final String START_ACTIVITY_PATH = "/start-activity-twear";
-    private static final String SEND_TWEETS_PATH = "/send-tweets-twear";
     private static final String TAG = "TLWearActivity";
 
     private GoogleApiClient mGoogleApiClient;
     private SampleGridPagerAdapter pagerAdapter;
 
     private ProgressBar loading;
+
+    private SwipeRefreshLayout refreshLayout;
 
 
     private boolean requestTweets;
@@ -52,15 +57,15 @@ public class TimeLineActivity extends Activity implements GoogleApiClient.Connec
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_time_line);
 
+
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addApi(Wearable.API)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .build();
-        mGoogleApiClient.connect();
 
+        TwearWearableSingleton.INSTANCE.setGoogleApiClient(mGoogleApiClient);
         loading = (ProgressBar) findViewById(R.id.tweets_pb);
-
         final Resources res = getResources();
         final GridViewPager pager = (GridViewPager) findViewById(R.id.pager);
         pager.setOnApplyWindowInsetsListener(new View.OnApplyWindowInsetsListener() {
@@ -89,34 +94,22 @@ public class TimeLineActivity extends Activity implements GoogleApiClient.Connec
         DotsPageIndicator dotsPageIndicator = (DotsPageIndicator) findViewById(R.id.page_indicator);
         dotsPageIndicator.setPager(pager);
         requestTweets = true;
-        pager.setOnPageChangeListener(new GridViewPager.OnPageChangeListener() {
+
+        refreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
+        refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
-            public void onPageScrolled(int row, int column, float rowOffset, float columnOffset, int rowOffsetPixels, int columnOffsetPixels) {
-
-
-                if (row == 0 && rowOffset < -0.1f) {
-                    changeLoadingBarVisibility(View.VISIBLE);
-                    LOGD(TAG, "refresh");
-                    new RequestTweetsActivityTask(mGoogleApiClient).execute(10L, TwearWearableSingleton.INSTANCE.getRows().get(0).getId());
-                } else {
-                    changeLoadingBarVisibility(View.INVISIBLE);
+            public void onRefresh() {
+                LOGD(TAG, "refresh");
+                Long maxId = null;
+                if (TwearWearableSingleton.INSTANCE.getRows() != null && TwearWearableSingleton.INSTANCE.getRows().size() > 0) {
+                    maxId = TwearWearableSingleton.INSTANCE.getRows().get(0).getId();
                 }
-                if (row == pagerAdapter.getRowCount() - 1 && rowOffset > 0.1f) {
-                    LOGD(TAG, "load more tweets");
-                }
-
-            }
-
-            @Override
-            public void onPageSelected(int row, int column) {
-                LOGD(TAG, "this row = " + row + " Row Count " + pagerAdapter.getRowCount());
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-                LOGD(TAG, "onPageScrollStateChanged state " + state);
+                new RequestTweetsActivityTask(10, maxId, null).execute();
             }
         });
+        mGoogleApiClient.connect();
+        addNewRow(new TweetRow(Long.MAX_VALUE, 0L, new Row(new LoadMoreFragment())));
+
 
     }
 
@@ -124,7 +117,7 @@ public class TimeLineActivity extends Activity implements GoogleApiClient.Connec
     private Fragment cardFragment(String title, String text) {
         Resources res = this.getResources();
         CardFragment fragment =
-                CardFragment.create(title, text);
+                CardFragment.create(title, text, R.drawable.tw__ic_logo_blue);
         // Add some extra bottom margin to leave room for the page indicator
         fragment.setCardMarginBottom(
                 res.getDimensionPixelSize(R.dimen.card_margin_bottom));
@@ -146,7 +139,7 @@ public class TimeLineActivity extends Activity implements GoogleApiClient.Connec
         Wearable.NodeApi.addListener(mGoogleApiClient, this);
         if (requestTweets) {
             requestTweets = false;
-            new RequestTweetsActivityTask(mGoogleApiClient).execute(10L);
+            new RequestTweetsActivityTask(10, null, null).execute();
         }
     }
 
@@ -173,17 +166,31 @@ public class TimeLineActivity extends Activity implements GoogleApiClient.Connec
         if (messageEvent.getPath().equals(SEND_TWEETS_PATH)) {
             changeLoadingBarVisibility(View.INVISIBLE);
             Row row = null;
+
+            Bundle idBundle = new Bundle();
+            idBundle.putLong(TWEET_ID, map.getLong("id"));
+            Fragment favFragment = new FavouriteFragment();
+            favFragment.setArguments(idBundle);
+            Fragment rtwFragment = new RetweetFragment();
+            rtwFragment.setArguments(idBundle);
+
             if (map.getByteArray("image") != null) {
                 FragmentImageView imageFragment = new FragmentImageView();
                 Bundle b = new Bundle();
                 b.putByteArray("image", map.getByteArray("image"));
                 imageFragment.setArguments(b);
-                row = new Row(cardFragment(map.getString("user"), map.getString("text")), imageFragment);
+                row = new Row(cardFragment(map.getString("user"), map.getString("text")), imageFragment, favFragment, rtwFragment);
             } else {
-                row = new Row(cardFragment(map.getString("user"), map.getString("text")));
+                row = new Row(cardFragment(map.getString("user"), map.getString("text")), favFragment, rtwFragment);
             }
             addNewRow(new TweetRow(map.getLong("id"), map.getLong("timestamp"), row));
+
+        } else if (messageEvent.getPath().equals(SEND_NO_TWEETS_PATH)) {
+            changeLoadingBarVisibility(View.INVISIBLE);
+            refreshLayout.setRefreshing(false);
+
         }
+
     }
 
     private void changeLoadingBarVisibility(final int visibility) {
@@ -218,9 +225,8 @@ public class TimeLineActivity extends Activity implements GoogleApiClient.Connec
     }
 
     public static void LOGD(final String tag, String message) {
-//        if (Log.isLoggable(tag, Log.DEBUG)) {
         Log.d(tag, message);
-//        }
     }
+
 
 }
