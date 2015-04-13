@@ -12,8 +12,8 @@
         android:id="@+id/retweet_round"
         android:src="@drawable/retweet"
         app:circle_color="@color/tw__blue_default"
-        app:circle_radius="35dp"
-        app:circle_radius_pressed="45dp"
+        app:circle_radius="45dp"
+        app:circle_radius_pressed="52dp"
         android:layout_gravity="center" />
 
 
