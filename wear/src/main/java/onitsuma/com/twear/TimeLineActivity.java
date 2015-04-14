@@ -28,7 +28,6 @@ import onitsuma.com.twear.adapter.Row;
 import onitsuma.com.twear.adapter.SampleGridPagerAdapter;
 import onitsuma.com.twear.fragment.FavouriteFragment;
 import onitsuma.com.twear.fragment.FragmentImageView;
-import onitsuma.com.twear.fragment.LoadMoreFragment;
 import onitsuma.com.twear.fragment.RetweetFragment;
 import onitsuma.com.twear.model.TweetRow;
 import onitsuma.com.twear.singleton.TwearWearableSingleton;
@@ -108,7 +107,6 @@ public class TimeLineActivity extends Activity implements GoogleApiClient.Connec
             }
         });
         mGoogleApiClient.connect();
-        addNewRow(new TweetRow(Long.MAX_VALUE, 0L, new Row(new LoadMoreFragment())));
 
 
     }

@@ -1,17 +1,24 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<android.support.wearable.view.BoxInsetLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="onitsuma.com.twear.fragment.FavouriteFragment">
+    android:layout_width="match_parent">
 
-    <android.support.wearable.view.CircledImageView
-        android:id="@+id/favorite_round"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:src="@drawable/favorite"
-        app:circle_color="@color/tw__blue_default"
-        app:circle_radius="45dp"
-        app:circle_radius_pressed="52dp"
-        android:layout_gravity="center" />
-</FrameLayout>
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <android.support.wearable.view.DelayedConfirmationView
+            android:id="@+id/delayed_confirmation"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:src="@drawable/abc_btn_rating_star_off_mtrl_alpha"
+            app:circle_color="@color/tw__blue_default"
+            app:circle_radius="@dimen/circle_radius"
+            app:circle_radius_pressed="@dimen/circle_radius_pressed"
+            app:circle_padding="@dimen/circle_padding"
+            app:circle_border_width="@dimen/circle_border_normal_width"
+            app:circle_border_color="@color/tw__light_gray" />
+
+    </FrameLayout>
+</android.support.wearable.view.BoxInsetLayout>
