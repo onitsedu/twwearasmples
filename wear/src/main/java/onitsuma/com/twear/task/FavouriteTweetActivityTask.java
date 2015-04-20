@@ -17,40 +17,29 @@ import onitsuma.com.twear.utils.TwearConstants;
 /**
  * Created by csuay on 09/04/15.
  */
-public class RequestTweetsActivityTask extends AsyncTask<Long, Void, Void> implements TwearConstants {
+public class FavouriteTweetActivityTask extends AsyncTask<Long, Void, Void> implements TwearConstants {
 
     private static final String TAG = "ReqTweets";
     private GoogleApiClient mGoogleApiClient;
 
-    private Integer mOffset;
-    private Long mMaxId;
-    private Long mSinceId;
+    private Long mTweetId;
 
-    public RequestTweetsActivityTask(Integer offset, Long maxId, Long sinceId) {
+    public FavouriteTweetActivityTask(Long tweetId) {
         this.mGoogleApiClient = TwearWearableSingleton.INSTANCE.getGoogleApiClient();
-        this.mOffset = offset;
-        this.mMaxId = maxId;
-        this.mSinceId = sinceId;
+        this.mTweetId = tweetId;
     }
 
     @Override
     protected Void doInBackground(Long... params) {
-        Log.d(TAG, "Requesting messages");
-        DataMap map = new DataMap();
-        map.putInt(MESSAGE_OFFSET, mOffset);
-        if (mMaxId != null) {
-            map.putLong(MESSAGE_MAX_ID, mMaxId);
-        }
-        if (mSinceId != null) {
-            map.putLong(MESSAGE_SINCE_ID, mSinceId);
-        }
 
+        DataMap map = new DataMap();
+        map.putLong(TWEET_ID, mTweetId);
         NodeApi.GetConnectedNodesResult nodes =
                 Wearable.NodeApi.getConnectedNodes(mGoogleApiClient).await();
 
         for (Node node : nodes.getNodes()) {
             Wearable.MessageApi.sendMessage(
-                    mGoogleApiClient, node.getId(), RETRIEVE_TWEETS_PATH, map.toByteArray()).setResultCallback(
+                    mGoogleApiClient, node.getId(), FAVOURITE_TWEET_PATH, map.toByteArray()).setResultCallback(
                     new ResultCallback<MessageApi.SendMessageResult>() {
                         @Override
                         public void onResult(MessageApi.SendMessageResult sendMessageResult) {

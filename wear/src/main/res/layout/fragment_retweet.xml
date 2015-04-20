@@ -1,20 +1,24 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+<android.support.wearable.view.BoxInsetLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context="onitsuma.com.twear.fragment.RetweetFragment">
+    android:layout_height="match_parent"
+    android:layout_width="match_parent">
 
-    <!-- TODO: Update blank fragment layout -->
-    <android.support.wearable.view.CircledImageView
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:id="@+id/retweet_round"
-        android:src="@drawable/retweet"
-        app:circle_color="@color/tw__blue_default"
-        app:circle_radius="45dp"
-        app:circle_radius_pressed="52dp"
-        android:layout_gravity="center" />
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
+        <android.support.wearable.view.DelayedConfirmationView
+            android:id="@+id/rtw_delayed_confirmation"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:src="@drawable/retweet"
+            app:circle_color="@color/tw__blue_default"
+            app:circle_radius="@dimen/circle_radius"
+            app:circle_radius_pressed="@dimen/circle_radius_pressed"
+            app:circle_padding="@dimen/circle_padding"
+            app:circle_border_width="@dimen/circle_border_normal_width"
+            app:circle_border_color="@color/tw__light_gray" />
 
-</FrameLayout>
+    </FrameLayout>
+</android.support.wearable.view.BoxInsetLayout>

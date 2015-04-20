@@ -15,9 +15,12 @@ public interface TwearConstants {
     public static final String RETRIEVE_TWEETS_PATH = "/twear-retrieve-tweets";
     public static final String SEND_TWEETS_PATH = "/send-tweets-twear";
     public static final String SEND_NO_TWEETS_PATH = "/send-no-tweets-twear";
+    public static final String FAVOURITE_TWEET_PATH = "/favourite_tweet-twear";
+    public static final String RETWEET_PATH = "/retweet-twear";
 
 
     public static final String MESSAGE_OFFSET = "offset";
     public static final String MESSAGE_MAX_ID = "maxId";
     public static final String MESSAGE_SINCE_ID = "sinceId";
+    public static final String MESSAGE_TWEET_ID = "tweetId";
 }

@@ -8,7 +8,7 @@
         android:layout_height="match_parent">
 
         <android.support.wearable.view.DelayedConfirmationView
-            android:id="@+id/delayed_confirmation"
+            android:id="@+id/fav_delayed_confirmation"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="center"

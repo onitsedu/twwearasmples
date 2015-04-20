@@ -162,7 +162,7 @@ public class TimeLineActivity extends Activity implements GoogleApiClient.Connec
         LOGD(TAG, "onMessageReceived: " + messageEvent);
         DataMap map = DataMap.fromByteArray(messageEvent.getData());
         if (messageEvent.getPath().equals(SEND_TWEETS_PATH)) {
-            changeLoadingBarVisibility(View.INVISIBLE);
+            dismissRefreshLoadingLayout(View.INVISIBLE);
             Row row = null;
 
             Bundle idBundle = new Bundle();
@@ -184,18 +184,17 @@ public class TimeLineActivity extends Activity implements GoogleApiClient.Connec
             addNewRow(new TweetRow(map.getLong("id"), map.getLong("timestamp"), row));
 
         } else if (messageEvent.getPath().equals(SEND_NO_TWEETS_PATH)) {
-            changeLoadingBarVisibility(View.INVISIBLE);
-            refreshLayout.setRefreshing(false);
+            dismissRefreshLoadingLayout(View.INVISIBLE);
 
         }
 
     }
 
-    private void changeLoadingBarVisibility(final int visibility) {
+    private void dismissRefreshLoadingLayout(final int visibility) {
         Runnable changeStatus = new Runnable() {
             @Override
             public void run() {
-                loading.setVisibility(visibility);
+                refreshLayout.setRefreshing(false);
             }
         };
         runOnUiThread(changeStatus);

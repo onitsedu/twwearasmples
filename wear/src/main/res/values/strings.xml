@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (C) 2014 The Android Open Source Project
+<?xml version="1.0" encoding="utf-8"?><!-- Copyright (C) 2014 The Android Open Source Project
 
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
@@ -39,7 +38,10 @@
     <string name="dismiss_text">To exit the application, swipe from left to right.</string>
     <string name="custom_fragment_text">"GridViewPager will accept any fragment. This is an example of a custom fragment with it's own background."</string>
 
-<!-- TODO: Remove or change this placeholder text -->
+    <string name="favourited_text">Tweet favourited</string>
+    <string name="retweeted_text">Tweet retweeted</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>

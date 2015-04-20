@@ -95,7 +95,18 @@ public class TwearListenerService extends IntentService implements DataApi.DataL
                 .getRequestId() + " " + messageEvent.getPath());
         DataMap map = DataMap.fromByteArray(messageEvent.getData());
         if (messageEvent.getPath().equals(RETRIEVE_TWEETS_PATH)) {
-            sendTweetsToWearable(map.getLong("maxId") != 0 ? map.getLong("maxId") : null);
+            Long maxId = map.getLong("maxId") != 0 ? map.getLong("maxId") : null;
+            sendTweetsToWearable(maxId);
+        } else if (messageEvent.getPath().equals(FAVOURITE_TWEET_PATH)) {
+            Long favId = map.getLong(TWEET_ID);
+            if (favId != null) {
+                favouriteTweet(favId);
+            }
+        } else if (messageEvent.getPath().equals(RETWEET_PATH)) {
+            Long favId = map.getLong(TWEET_ID);
+            if (favId != null) {
+                retweetTweet(favId);
+            }
         }
 
     }
@@ -130,7 +141,6 @@ public class TwearListenerService extends IntentService implements DataApi.DataL
                     new SendMessageAsyncTask(mGoogleApiClient, ACTION_SEND_TWEETS, tuits).execute();
                 } else {
                     new SendMessageAsyncTask(mGoogleApiClient, ACTION_NO_TWEETS, null).execute();
-
                 }
             }
 
@@ -138,7 +148,38 @@ public class TwearListenerService extends IntentService implements DataApi.DataL
             public void failure(TwitterException e) {
             }
         };
-        mTwClient.getStatusesService().homeTimeline(10, null, maxId, null, null, null, null, twCallback);
+        mTwClient.getStatusesService().homeTimeline(10, maxId, null, null, null, null, null, twCallback);
+    }
+
+    private void favouriteTweet(Long idTweet) {
+        Callback<Tweet> twCallback = new Callback<Tweet>() {
+            @Override
+            public void success(Result<Tweet> result) {
+                LOGD(TAG, "favorited? " + result.data.favorited);
+            }
+
+            @Override
+            public void failure(TwitterException e) {
+                //FAILING FAVORITE
+            }
+        };
+
+        mTwClient.getFavoriteService().create(idTweet, true, twCallback);
+    }
+
+    private void retweetTweet(Long idTweet) {
+        Callback<Tweet> twCallback = new Callback<Tweet>() {
+            @Override
+            public void success(Result<Tweet> result) {
+                LOGD(TAG, "retweeted? " + result.data.favorited);
+            }
+
+            @Override
+            public void failure(TwitterException e) {
+                //FAILING FAVORITE
+            }
+        };
+        mTwClient.getStatusesService().retweet(idTweet, true, twCallback);
     }
 
     private Tuit parseTuit(final Tweet tweet) {
@@ -172,6 +213,7 @@ public class TwearListenerService extends IntentService implements DataApi.DataL
     private static void LOGD(final String tag, String message) {
         Log.d(tag, message);
     }
+
 
     @Override
     protected void onHandleIntent(Intent intent) {

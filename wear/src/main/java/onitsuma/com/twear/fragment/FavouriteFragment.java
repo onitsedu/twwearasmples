@@ -1,7 +1,9 @@
 package onitsuma.com.twear.fragment;
 
 import android.app.Fragment;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.wearable.activity.ConfirmationActivity;
 import android.support.wearable.view.DelayedConfirmationView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -9,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import onitsuma.com.twear.R;
+import onitsuma.com.twear.task.FavouriteTweetActivityTask;
 import onitsuma.com.twear.utils.TwearConstants;
 
 public class FavouriteFragment extends Fragment implements TwearConstants, DelayedConfirmationView.DelayedConfirmationListener {
@@ -30,7 +33,7 @@ public class FavouriteFragment extends Fragment implements TwearConstants, Delay
                              Bundle savedInstanceState) {
 
         View ret = inflater.inflate(R.layout.fragment_favourite, container, false);
-        mDelayedConfirmationView = (DelayedConfirmationView) ret.findViewById(R.id.delayed_confirmation);
+        mDelayedConfirmationView = (DelayedConfirmationView) ret.findViewById(R.id.fav_delayed_confirmation);
         return ret;
     }
 
@@ -63,7 +66,7 @@ public class FavouriteFragment extends Fragment implements TwearConstants, Delay
         v.setPressed(true);
         Log.d(TAG, "Timer Selected");
         // Prevent onTimerFinished from being heard.
-      //  ((DelayedConfirmationView) v).setListener(null);
+        //  ((DelayedConfirmationView) v).setListener(null);
     }
 
     @Override
@@ -71,5 +74,12 @@ public class FavouriteFragment extends Fragment implements TwearConstants, Delay
         Log.d(TAG, "Timer Finished - > favorite tweet with ID ->" + mTweetId);
         mDelayedConfirmationView.setImageResource(R.drawable.abc_btn_rating_star_on_mtrl_alpha);
         mDelayedConfirmationView.reset();
+        Intent intent = new Intent(getActivity(), ConfirmationActivity.class);
+        intent.putExtra(ConfirmationActivity.EXTRA_ANIMATION_TYPE,
+                ConfirmationActivity.SUCCESS_ANIMATION);
+        intent.putExtra(ConfirmationActivity.EXTRA_MESSAGE,
+                getString(R.string.favourited_text));
+        startActivity(intent);
+        new FavouriteTweetActivityTask(mTweetId).execute();
     }
 }

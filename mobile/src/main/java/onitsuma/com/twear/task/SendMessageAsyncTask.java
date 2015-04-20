@@ -41,10 +41,12 @@ public class SendMessageAsyncTask extends AsyncTask<Void, Void, Void> implements
         Collection<String> nodes = getNodes();
         for (String node : nodes) {
             if (mAction.equals(ACTION_SEND_TWEETS)) {
+                Log.d(TAG,"Sending tweets");
                 for (Tuit tuit : mTuits) {
                     sendTuitsMessage(node, tuit);
                 }
             } else if (mAction.equals(ACTION_NO_TWEETS)) {
+                Log.d(TAG,"Sending No tweets Message");
                 sendNoTuitsMessage(node);
             }
         }
