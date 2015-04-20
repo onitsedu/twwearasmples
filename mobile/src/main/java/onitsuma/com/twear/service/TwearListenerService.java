@@ -18,6 +18,7 @@ package onitsuma.com.twear.service;
 
 import android.app.IntentService;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -95,7 +96,7 @@ public class TwearListenerService extends IntentService implements DataApi.DataL
                 .getRequestId() + " " + messageEvent.getPath());
         DataMap map = DataMap.fromByteArray(messageEvent.getData());
         if (messageEvent.getPath().equals(RETRIEVE_TWEETS_PATH)) {
-            Long maxId = map.getLong("maxId") != 0 ? map.getLong("maxId") : null;
+            Long maxId = map.getLong(MESSAGE_MAX_ID) != 0 ? map.getLong(MESSAGE_MAX_ID) : null;
             sendTweetsToWearable(maxId);
         } else if (messageEvent.getPath().equals(FAVOURITE_TWEET_PATH)) {
             Long favId = map.getLong(TWEET_ID);
@@ -127,6 +128,8 @@ public class TwearListenerService extends IntentService implements DataApi.DataL
         Wearable.MessageApi.removeListener(mGoogleApiClient, this);
         Wearable.NodeApi.removeListener(mGoogleApiClient, this);
     }
+
+
 
 
     private void sendTweetsToWearable(Long maxId) {
