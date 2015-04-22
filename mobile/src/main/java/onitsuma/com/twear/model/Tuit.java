@@ -1,9 +1,11 @@
 package onitsuma.com.twear.model;
 
+import java.util.Comparator;
+
 /**
  * Created by csuay on 08/04/15.
  */
-public class Tuit {
+public class Tuit implements Comparator<Long> {
 
     private String userName;
     private String text;
@@ -61,4 +63,8 @@ public class Tuit {
         this.userImage = userImage;
     }
 
+    @Override
+    public int compare(Long lhs, Long rhs) {
+        return (int) (lhs - rhs);
+    }
 }

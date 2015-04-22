@@ -8,5 +8,6 @@
 
     <string name="logout_settings">Logout</string>
     <string name="title_activity_selector">SelectorActivity</string>
+    <string name="title_activity_tweet">TweetActivity</string>
 
 </resources>
