@@ -17,6 +17,7 @@ public interface TwearConstants {
     public static final String SEND_NO_TWEETS_PATH = "/send-no-tweets-twear";
     public static final String FAVOURITE_TWEET_PATH = "/favourite_tweet-twear";
     public static final String RETWEET_PATH = "/retweet-twear";
+    public static final String OPEN_ON_DEVICE_PATH = "/open-on-device-twear";
 
 
     public static final String ACTION_SEND_TWEETS = "send_tweets";

@@ -18,7 +18,6 @@ package onitsuma.com.twear.service;
 
 import android.app.IntentService;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -108,7 +107,13 @@ public class TwearListenerService extends IntentService implements DataApi.DataL
             if (favId != null) {
                 retweetTweet(favId);
             }
+        } else if (messageEvent.getPath().equals(OPEN_ON_DEVICE_PATH)) {
+            Long favId = map.getLong(TWEET_ID);
+            if (favId != null) {
+//TODO
+            }
         }
+
 
     }
 
@@ -128,8 +133,6 @@ public class TwearListenerService extends IntentService implements DataApi.DataL
         Wearable.MessageApi.removeListener(mGoogleApiClient, this);
         Wearable.NodeApi.removeListener(mGoogleApiClient, this);
     }
-
-
 
 
     private void sendTweetsToWearable(Long maxId) {
