@@ -1,5 +1,6 @@
 package onitsuma.com.twear.fragment;
 
+
 import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,16 +12,22 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import onitsuma.com.twear.R;
-import onitsuma.com.twear.task.FavouriteTweetActivityTask;
+import onitsuma.com.twear.task.OpenOnPhoneActivityTask;
 import onitsuma.com.twear.utils.TwearConstants;
 
-public class FavouriteFragment extends Fragment implements TwearConstants, DelayedConfirmationView.DelayedConfirmationListener {
-    private final static String TAG = "FavFragment";
-    Long mTweetId;
+/**
+ * A simple {@link Fragment} subclass.
+ */
+public class OpenOnDeviceFragment extends Fragment implements TwearConstants, DelayedConfirmationView.DelayedConfirmationListener {
+
+    private final static String TAG = "OpenOnDeviceFragment";
     private DelayedConfirmationView mDelayedConfirmationView;
     private static final int NUM_SECONDS = 2;
     private boolean isAnimating = false;
+    private Long mTweetId;
 
+    public OpenOnDeviceFragment() {
+    }
 
     @Override
     public void setArguments(Bundle args) {
@@ -31,9 +38,8 @@ public class FavouriteFragment extends Fragment implements TwearConstants, Delay
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
-        View ret = inflater.inflate(R.layout.fragment_favourite, container, false);
-        mDelayedConfirmationView = (DelayedConfirmationView) ret.findViewById(R.id.fav_delayed_confirmation);
+        View ret = inflater.inflate(R.layout.fragment_open_on_device, container, false);
+        mDelayedConfirmationView = (DelayedConfirmationView) ret.findViewById(R.id.open_delayed_confirmation);
         return ret;
     }
 
@@ -47,7 +53,7 @@ public class FavouriteFragment extends Fragment implements TwearConstants, Delay
                 Log.d(TAG, "Timer Clicked");
                 if (isAnimating) {
                     isAnimating = false;
-                    mDelayedConfirmationView.setImageResource(R.drawable.abc_btn_rating_star_off_mtrl_alpha);
+                    mDelayedConfirmationView.setImageResource(R.drawable.common_full_open_on_phone);
                     mDelayedConfirmationView.reset();
                     Intent intent = new Intent(getActivity(), ConfirmationActivity.class);
                     intent.putExtra(ConfirmationActivity.EXTRA_ANIMATION_TYPE,
@@ -67,25 +73,24 @@ public class FavouriteFragment extends Fragment implements TwearConstants, Delay
         mDelayedConfirmationView.setListener(this);
     }
 
-
-    public void onTimerSelected(View v) {
-        v.setPressed(true);
-        Log.d(TAG, "Timer Selected");
-        // Prevent onTimerFinished from being heard.
-        //  ((DelayedConfirmationView) v).setListener(null);
-    }
-
     @Override
     public void onTimerFinished(View v) {
-        Log.d(TAG, "Timer Finished - > favorite tweet with ID ->" + mTweetId);
-        mDelayedConfirmationView.setImageResource(R.drawable.abc_btn_rating_star_on_mtrl_alpha);
+        Log.d(TAG, "Timer Finished - > open tweet with ID ->" + mTweetId);
+        mDelayedConfirmationView.setImageResource(R.drawable.common_full_open_on_phone);
         mDelayedConfirmationView.reset();
         Intent intent = new Intent(getActivity(), ConfirmationActivity.class);
         intent.putExtra(ConfirmationActivity.EXTRA_ANIMATION_TYPE,
-                ConfirmationActivity.SUCCESS_ANIMATION);
+                ConfirmationActivity.OPEN_ON_PHONE_ANIMATION);
         intent.putExtra(ConfirmationActivity.EXTRA_MESSAGE,
-                getString(R.string.favourited_text));
+                getString(R.string.open_on_phone_text));
         startActivity(intent);
-        new FavouriteTweetActivityTask(mTweetId).execute();
+        new OpenOnPhoneActivityTask(mTweetId).execute();
+
+    }
+
+    @Override
+    public void onTimerSelected(View v) {
+        v.setPressed(true);
+        Log.d(TAG, "Timer Selected");
     }
 }

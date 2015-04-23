@@ -3,6 +3,7 @@ package onitsuma.com.twear;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.res.Resources;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.wearable.view.CardFragment;
@@ -15,19 +16,25 @@ import android.widget.ProgressBar;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.data.FreezableUtils;
 import com.google.android.gms.wearable.DataApi;
+import com.google.android.gms.wearable.DataEvent;
 import com.google.android.gms.wearable.DataEventBuffer;
 import com.google.android.gms.wearable.DataMap;
+import com.google.android.gms.wearable.DataMapItem;
 import com.google.android.gms.wearable.MessageApi;
 import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.Wearable;
 
+import java.util.List;
+
 import onitsuma.com.twear.adapter.Row;
 import onitsuma.com.twear.adapter.SampleGridPagerAdapter;
 import onitsuma.com.twear.fragment.FavouriteFragment;
 import onitsuma.com.twear.fragment.FragmentImageView;
+import onitsuma.com.twear.fragment.OpenOnDeviceFragment;
 import onitsuma.com.twear.fragment.RetweetFragment;
 import onitsuma.com.twear.model.TweetRow;
 import onitsuma.com.twear.singleton.TwearWearableSingleton;
@@ -155,6 +162,43 @@ public class TimeLineActivity extends Activity implements GoogleApiClient.Connec
     @Override
     public void onDataChanged(DataEventBuffer dataEvents) {
         LOGD(TAG, "onDataChanged: " + dataEvents);
+        final List<DataEvent> events = FreezableUtils.freezeIterable(dataEvents);
+        for (DataEvent event : events) {
+            final Uri uri = event.getDataItem().getUri();
+            final String path = uri != null ? uri.getPath() : null;
+            if (TWEETS_DATA_ITEMS.equals(path)) {
+
+                final DataMap map = DataMapItem.fromDataItem(event.getDataItem()).getDataMap();
+
+                dismissRefreshLoadingLayout(View.INVISIBLE);
+                Row row;
+
+                Bundle idBundle = new Bundle();
+                idBundle.putLong(TWEET_ID, map.getLong("id"));
+                Fragment favFragment = new FavouriteFragment();
+                favFragment.setArguments(idBundle);
+                Fragment rtwFragment = new RetweetFragment();
+                rtwFragment.setArguments(idBundle);
+                Fragment openOnDeviceFragment = new OpenOnDeviceFragment();
+                openOnDeviceFragment.setArguments(idBundle);
+
+                if (map.getByteArray("image") != null) {
+                    FragmentImageView imageFragment = new FragmentImageView();
+                    Bundle b = new Bundle();
+                    b.putByteArray("image", map.getByteArray("image"));
+                    imageFragment.setArguments(b);
+                    row = new Row(cardFragment(map.getString("user"), map.getString("text")), imageFragment, favFragment, rtwFragment, openOnDeviceFragment);
+                } else {
+                    row = new Row(cardFragment(map.getString("user"), map.getString("text")), favFragment, rtwFragment, openOnDeviceFragment);
+                }
+                addNewRow(new TweetRow(map.getLong("id"), map.getLong("timestamp"), row));
+
+            } else if (TWEETS_DATA_ITEMS_EMPTY.equals(path)) {
+                dismissRefreshLoadingLayout(View.INVISIBLE);
+
+            }
+        }
+
     }
 
     @Override
@@ -171,15 +215,17 @@ public class TimeLineActivity extends Activity implements GoogleApiClient.Connec
             favFragment.setArguments(idBundle);
             Fragment rtwFragment = new RetweetFragment();
             rtwFragment.setArguments(idBundle);
+            Fragment openOnDeviceFragment = new OpenOnDeviceFragment();
+            openOnDeviceFragment.setArguments(idBundle);
 
             if (map.getByteArray("image") != null) {
                 FragmentImageView imageFragment = new FragmentImageView();
                 Bundle b = new Bundle();
                 b.putByteArray("image", map.getByteArray("image"));
                 imageFragment.setArguments(b);
-                row = new Row(cardFragment(map.getString("user"), map.getString("text")), imageFragment, favFragment, rtwFragment);
+                row = new Row(cardFragment(map.getString("user"), map.getString("text")), imageFragment, favFragment, rtwFragment, openOnDeviceFragment);
             } else {
-                row = new Row(cardFragment(map.getString("user"), map.getString("text")), favFragment, rtwFragment);
+                row = new Row(cardFragment(map.getString("user"), map.getString("text")), favFragment, rtwFragment, openOnDeviceFragment);
             }
             addNewRow(new TweetRow(map.getLong("id"), map.getLong("timestamp"), row));
 

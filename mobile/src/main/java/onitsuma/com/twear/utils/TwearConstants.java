@@ -5,28 +5,31 @@ package onitsuma.com.twear.utils;
  */
 public interface TwearConstants {
 
-    public static final String TWEET_IMAGE = "image";
-    public static final String TWEET_TEXT = "text";
-    public static final String TWEET_USERNAME = "user";
-    public static final String TWEET_ID = "id";
-    public static final String TWEET_TIMESTAMP = "timestamp";
+    String TWEET_IMAGE = "image";
+    String TWEET_TEXT = "text";
+    String TWEET_USERNAME = "user";
+    String TWEET_ID = "id";
+    String TWEET_TIMESTAMP = "timestamp";
 
-    public static final String START_ACTIVITY_PATH = "/start-activity-twear";
-    public static final String RETRIEVE_TWEETS_PATH = "/twear-retrieve-tweets";
-    public static final String SEND_TWEETS_PATH = "/send-tweets-twear";
-    public static final String SEND_NO_TWEETS_PATH = "/send-no-tweets-twear";
-    public static final String FAVOURITE_TWEET_PATH = "/favourite_tweet-twear";
-    public static final String RETWEET_PATH = "/retweet-twear";
-    public static final String OPEN_ON_DEVICE_PATH = "/open-on-device-twear";
+    String START_ACTIVITY_PATH = "/start-activity-twear";
+    String RETRIEVE_TWEETS_PATH = "/twear-retrieve-tweets";
+    String SEND_TWEETS_PATH = "/send-tweets-twear";
+    String SEND_NO_TWEETS_PATH = "/send-no-tweets-twear";
+    String FAVOURITE_TWEET_PATH = "/favourite_tweet-twear";
+    String RETWEET_PATH = "/retweet-twear";
+    String OPEN_ON_DEVICE_PATH = "/open-on-device-twear";
+
+    String TWEETS_DATA_ITEMS = "/tweet-data-item-twear";
+    String TWEETS_DATA_ITEMS_EMPTY = "/tweet-data-item-empty-twear";
 
 
-    public static final String ACTION_SEND_TWEETS = "send_tweets";
-    public static final String ACTION_NO_TWEETS = "no_tweets";
+    String ACTION_SEND_TWEETS = "send_tweets";
+    String ACTION_NO_TWEETS = "no_tweets";
 
-    public static final String MESSAGE_OFFSET = "offset";
-    public static final String MESSAGE_MAX_ID = "maxId";
-    public static final String MESSAGE_SINCE_ID = "sinceId";
-    public static final String MESSAGE_TWEET_ID = "tweetId";
+    String MESSAGE_OFFSET = "offset";
+    String MESSAGE_MAX_ID = "maxId";
+    String MESSAGE_SINCE_ID = "sinceId";
+    String MESSAGE_TWEET_ID = "tweetId";
 }
 
 

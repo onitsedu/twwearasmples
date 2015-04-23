@@ -40,6 +40,8 @@
 
     <string name="favourited_text">Tweet favourited</string>
     <string name="retweeted_text">Tweet retweeted</string>
+    <string name="open_on_phone_text">Tweet opened</string>
+    <string name="cancel_text">Action cancelled</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

@@ -34,6 +34,8 @@ public class TweetActivity extends ActionBarActivity implements TwearConstants {
             @Override
             public void success(Tweet tweet) {
                 TweetView tv = new TweetView(mActivityContext, tweet);
+
+
                 tweetLayout.addView(tv);
             }
 

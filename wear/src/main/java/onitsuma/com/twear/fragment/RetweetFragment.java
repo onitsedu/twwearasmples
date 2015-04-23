@@ -15,7 +15,7 @@ import onitsuma.com.twear.task.RetweetActivityTask;
 import onitsuma.com.twear.utils.TwearConstants;
 
 public class RetweetFragment extends Fragment implements TwearConstants, DelayedConfirmationView.DelayedConfirmationListener {
-    Long mTweetId;
+    private Long mTweetId;
     private final static String TAG = "RetweetFragment";
     private DelayedConfirmationView mDelayedConfirmationView;
     private static final int NUM_SECONDS = 2;
@@ -46,14 +46,19 @@ public class RetweetFragment extends Fragment implements TwearConstants, Delayed
                 Log.d(TAG, "Timer Clicked");
                 if (isAnimating) {
                     isAnimating = false;
-                    mDelayedConfirmationView.setImageResource(R.drawable.abc_btn_rating_star_off_mtrl_alpha);
+                    mDelayedConfirmationView.setImageResource(R.drawable.retweet);
                     mDelayedConfirmationView.reset();
                     return;
                 }
                 isAnimating = true;
                 mDelayedConfirmationView.setImageResource(R.drawable.ic_full_cancel);
                 mDelayedConfirmationView.setTotalTimeMs(NUM_SECONDS * 1000);
-                mDelayedConfirmationView.start();
+                mDelayedConfirmationView.start();                    Intent intent = new Intent(getActivity(), ConfirmationActivity.class);
+                    intent.putExtra(ConfirmationActivity.EXTRA_ANIMATION_TYPE,
+                            ConfirmationActivity.FAILURE_ANIMATION);
+                    intent.putExtra(ConfirmationActivity.EXTRA_MESSAGE,
+                            getString(R.string.cancel_text));
+                    startActivity(intent);
 
             }
         });
@@ -70,7 +75,7 @@ public class RetweetFragment extends Fragment implements TwearConstants, Delayed
     @Override
     public void onTimerFinished(View v) {
         Log.d(TAG, "Timer Finished - > favorite tweet with ID ->" + mTweetId);
-        mDelayedConfirmationView.setImageResource(R.drawable.abc_btn_rating_star_on_mtrl_alpha);
+        mDelayedConfirmationView.setImageResource(R.drawable.retweet);
         mDelayedConfirmationView.reset();
         Intent intent = new Intent(getActivity(), ConfirmationActivity.class);
         intent.putExtra(ConfirmationActivity.EXTRA_ANIMATION_TYPE,

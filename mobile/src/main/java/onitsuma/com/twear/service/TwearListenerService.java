@@ -30,6 +30,7 @@ import com.google.android.gms.wearable.MessageApi;
 import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.NodeApi;
+import com.google.android.gms.wearable.PutDataMapRequest;
 import com.google.android.gms.wearable.Wearable;
 import com.twitter.sdk.android.core.Callback;
 import com.twitter.sdk.android.core.Result;
@@ -43,10 +44,10 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import onitsuma.com.twear.activity.TweetActivity;
 import onitsuma.com.twear.model.Tuit;
 import onitsuma.com.twear.singleton.TwearSingleton;
 import onitsuma.com.twear.task.BitmapLoadingTask;
-import onitsuma.com.twear.task.SendMessageAsyncTask;
 import onitsuma.com.twear.utils.TwearConstants;
 import onitsuma.com.twear.utils.TwearUtils;
 
@@ -67,7 +68,6 @@ public class TwearListenerService extends IntentService implements DataApi.DataL
 
     public TwearListenerService() {
         super("TwearListenerService");
-
     }
 
 
@@ -76,6 +76,7 @@ public class TwearListenerService extends IntentService implements DataApi.DataL
         Wearable.DataApi.addListener(mGoogleApiClient, this);
         Wearable.MessageApi.addListener(mGoogleApiClient, this);
         Wearable.NodeApi.addListener(mGoogleApiClient, this);
+
 
     }
 
@@ -89,6 +90,7 @@ public class TwearListenerService extends IntentService implements DataApi.DataL
 
     }
 
+
     @Override
     public void onMessageReceived(MessageEvent messageEvent) {
         LOGD(TAG, "onMessageReceived() A message from watch was received:" + messageEvent
@@ -98,19 +100,22 @@ public class TwearListenerService extends IntentService implements DataApi.DataL
             Long maxId = map.getLong(MESSAGE_MAX_ID) != 0 ? map.getLong(MESSAGE_MAX_ID) : null;
             sendTweetsToWearable(maxId);
         } else if (messageEvent.getPath().equals(FAVOURITE_TWEET_PATH)) {
-            Long favId = map.getLong(TWEET_ID);
-            if (favId != null) {
-                favouriteTweet(favId);
+            Long twId = map.getLong(TWEET_ID);
+            if (twId != null) {
+                favouriteTweet(twId);
             }
         } else if (messageEvent.getPath().equals(RETWEET_PATH)) {
-            Long favId = map.getLong(TWEET_ID);
-            if (favId != null) {
-                retweetTweet(favId);
+            Long twId = map.getLong(TWEET_ID);
+            if (twId != null) {
+                retweetTweet(twId);
             }
         } else if (messageEvent.getPath().equals(OPEN_ON_DEVICE_PATH)) {
-            Long favId = map.getLong(TWEET_ID);
-            if (favId != null) {
-//TODO
+            Long twId = map.getLong(TWEET_ID);
+            if (twId != null) {
+                Intent intent = new Intent(getBaseContext(), TweetActivity.class);
+                intent.putExtra(TWEET_ID, twId);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                getApplication().startActivity(intent);
             }
         }
 
@@ -140,13 +145,21 @@ public class TwearListenerService extends IntentService implements DataApi.DataL
             @Override
             public void success(Result<List<Tweet>> listResult) {
                 List<Tuit> tuits = new ArrayList<>();
-                for (Tweet tweet : listResult.data) {
-                    tuits.add(parseTuit(tweet));
-                }
-                if (tuits.size() > 0) {
-                    new SendMessageAsyncTask(mGoogleApiClient, ACTION_SEND_TWEETS, tuits).execute();
+                if (listResult.data.size() > 0) {
+                    for (Tweet tweet : listResult.data) {
+                        final PutDataMapRequest putRequest = PutDataMapRequest.create(TWEETS_DATA_ITEMS);
+                        DataMap map = putRequest.getDataMap();
+                        Tuit tuit = parseTuit(tweet);
+                        map.putString(TWEET_TEXT, tuit.getText());
+                        map.putString(TWEET_USERNAME, tuit.getUserName());
+                        map.putLong(TWEET_TIMESTAMP, tuit.getTimestamp());
+                        map.putLong(TWEET_ID, tuit.getId());
+                        map.putByteArray(TWEET_IMAGE, tuit.getImage());
+                        Wearable.DataApi.putDataItem(mGoogleApiClient, putRequest.asPutDataRequest());
+                    }
                 } else {
-                    new SendMessageAsyncTask(mGoogleApiClient, ACTION_NO_TWEETS, null).execute();
+                    final PutDataMapRequest putRequest = PutDataMapRequest.create(TWEETS_DATA_ITEMS_EMPTY);
+                    Wearable.DataApi.putDataItem(mGoogleApiClient, putRequest.asPutDataRequest());
                 }
             }
 
@@ -156,6 +169,7 @@ public class TwearListenerService extends IntentService implements DataApi.DataL
         };
         mTwClient.getStatusesService().homeTimeline(10, maxId, null, null, null, null, null, twCallback);
     }
+
 
     private void favouriteTweet(Long idTweet) {
         Callback<Tweet> twCallback = new Callback<Tweet>() {
@@ -211,6 +225,7 @@ public class TwearListenerService extends IntentService implements DataApi.DataL
                 tuit.setTimestamp(TwearUtils.parseTwitterDate(tweet.createdAt).getTime());
                 tuit.setId(tweet.id);
                 tuit.setImage(image);
+
             }
         }.execute(imageUrl);
         return tuit;
