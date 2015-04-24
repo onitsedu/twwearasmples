@@ -107,8 +107,8 @@ public class TimeLineActivity extends Activity implements GoogleApiClient.Connec
             public void onRefresh() {
                 LOGD(TAG, "refresh");
                 Long maxId = null;
-                if (TwearWearableSingleton.INSTANCE.getRows() != null && TwearWearableSingleton.INSTANCE.getRows().size() > 0) {
-                    maxId = TwearWearableSingleton.INSTANCE.getRows().get(0).getId();
+                if (TwearWearableSingleton.INSTANCE.getRowsMap() != null && TwearWearableSingleton.INSTANCE.getRowsMap().size() > 0) {
+                    maxId = TwearWearableSingleton.INSTANCE.getRowsMap().firstEntry().getKey();
                 }
                 new RequestTweetsActivityTask(10, maxId, null).execute();
             }
@@ -207,7 +207,7 @@ public class TimeLineActivity extends Activity implements GoogleApiClient.Connec
         DataMap map = DataMap.fromByteArray(messageEvent.getData());
         if (messageEvent.getPath().equals(SEND_TWEETS_PATH)) {
             dismissRefreshLoadingLayout(View.INVISIBLE);
-            Row row = null;
+            Row row;
 
             Bundle idBundle = new Bundle();
             idBundle.putLong(TWEET_ID, map.getLong("id"));

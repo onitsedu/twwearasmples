@@ -2,10 +2,10 @@ package onitsuma.com.twear.singleton;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.TreeMap;
 
 import onitsuma.com.twear.model.TweetRow;
+import onitsuma.com.twear.utils.TweetComparator;
 
 
 /**
@@ -14,7 +14,9 @@ import onitsuma.com.twear.model.TweetRow;
 public enum TwearWearableSingleton {
     INSTANCE;
 
-    private List<TweetRow> rows;
+//    private List<TweetRow> rows;
+
+    private TreeMap<Long, TweetRow> rowsMap;
 
     private GoogleApiClient googleApiClient;
 
@@ -26,18 +28,34 @@ public enum TwearWearableSingleton {
         this.googleApiClient = googleApiClient;
     }
 
-    public List<TweetRow> getRows() {
-        return rows;
+//    public List<TweetRow> getRows() {
+//        return rows;
+//    }
+//
+//    public void setRows(List<TweetRow> rows) {
+//        this.rows = rows;
+//    }
+//
+//
+//    public void addRow(TweetRow row) {
+//        if (this.rows == null) {
+//            this.rows = new ArrayList<>();
+//        }
+//        this.rows.add(row);
+//    }
+
+    public TreeMap<Long, TweetRow> getRowsMap() {
+        return rowsMap;
     }
 
-    public void setRows(List<TweetRow> rows) {
-        this.rows = rows;
+    public void setRowsMap(TreeMap<Long, TweetRow> rowsMap) {
+        this.rowsMap = rowsMap;
     }
 
-    public void addRow(TweetRow row) {
-        if (this.rows == null) {
-            this.rows = new ArrayList<>();
+    public void addRowsMap(Long id, TweetRow row) {
+        if (this.rowsMap == null) {
+            this.rowsMap = new TreeMap<>(new TweetComparator());
         }
-        this.rows.add(row);
+        this.rowsMap.put(id, row);
     }
 }
