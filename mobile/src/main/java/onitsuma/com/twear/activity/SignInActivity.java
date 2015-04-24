@@ -21,8 +21,8 @@ import onitsuma.com.twear.singleton.TwearSingleton;
 public class SignInActivity extends Activity {
 
     // Note: Your consumer key and secret should be obfuscated in your source code before shipping.
-    private static final String TWITTER_KEY = "CrUzsu1kcZiL6NZstxRNRwHSv";
-    private static final String TWITTER_SECRET = "04aMc1DwPNTlPFMMr4cKjWKuzYJHUzKuFkhGyOcCuJp3gklfnT";
+    public static final String TWITTER_KEY = "CrUzsu1kcZiL6NZstxRNRwHSv";
+    public static final String TWITTER_SECRET = "04aMc1DwPNTlPFMMr4cKjWKuzYJHUzKuFkhGyOcCuJp3gklfnT";
     private TwitterLoginButton loginButton;
 
     @Override

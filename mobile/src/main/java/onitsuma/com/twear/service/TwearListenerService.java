@@ -16,11 +16,13 @@
 
 package onitsuma.com.twear.service;
 
-import android.app.IntentService;
+import android.app.Service;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.util.Log;
 
+import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.wearable.DataApi;
@@ -32,20 +34,22 @@ import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.PutDataMapRequest;
 import com.google.android.gms.wearable.Wearable;
+import com.twitter.sdk.android.Twitter;
 import com.twitter.sdk.android.core.Callback;
 import com.twitter.sdk.android.core.Result;
 import com.twitter.sdk.android.core.TwitterApiClient;
+import com.twitter.sdk.android.core.TwitterAuthConfig;
 import com.twitter.sdk.android.core.TwitterException;
 import com.twitter.sdk.android.core.TwitterSession;
 import com.twitter.sdk.android.core.models.Tweet;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 
+import io.fabric.sdk.android.Fabric;
+import onitsuma.com.twear.activity.SignInActivity;
 import onitsuma.com.twear.activity.TweetActivity;
-import onitsuma.com.twear.model.Tuit;
 import onitsuma.com.twear.singleton.TwearSingleton;
 import onitsuma.com.twear.task.BitmapLoadingTask;
 import onitsuma.com.twear.utils.TwearConstants;
@@ -54,7 +58,7 @@ import onitsuma.com.twear.utils.TwearUtils;
 /**
  * Listens to Messages from the Wearable node.
  */
-public class TwearListenerService extends IntentService implements DataApi.DataListener,
+public class TwearListenerService extends Service implements DataApi.DataListener,
         MessageApi.MessageListener, NodeApi.NodeListener, GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, TwearConstants {
 
@@ -66,8 +70,36 @@ public class TwearListenerService extends IntentService implements DataApi.DataL
     private TwitterSession mTwSession;
     private TwitterApiClient mTwClient;
 
-    public TwearListenerService() {
-        super("TwearListenerService");
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        LOGD(TAG, "on Start command");
+
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addApi(Wearable.API)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .build();
+        TwitterAuthConfig authConfig = new TwitterAuthConfig(SignInActivity.TWITTER_KEY, SignInActivity.TWITTER_SECRET);
+        Fabric.with(this, new Twitter(authConfig), new Crashlytics());
+        isTwConnected();
+        mTwSession = TwearSingleton.INSTANCE.getTwSession();
+        mTwClient = new TwitterApiClient(mTwSession);
+        mGoogleApiClient.connect();
+        return START_STICKY;
+    }
+
+    private void isTwConnected() {
+        TwitterSession twSession = Twitter.getSessionManager().getActiveSession();
+        if (twSession != null) {
+            TwearSingleton.INSTANCE.setTwSession(twSession);
+        }
+    }
+
+
+    @Override
+    public IBinder onBind(Intent intent) {
+        LOGD(TAG, "on Bind");
+        return null;
     }
 
 
@@ -101,22 +133,16 @@ public class TwearListenerService extends IntentService implements DataApi.DataL
             sendTweetsToWearable(maxId);
         } else if (messageEvent.getPath().equals(FAVOURITE_TWEET_PATH)) {
             Long twId = map.getLong(TWEET_ID);
-            if (twId != null) {
-                favouriteTweet(twId);
-            }
+            favouriteTweet(twId);
         } else if (messageEvent.getPath().equals(RETWEET_PATH)) {
             Long twId = map.getLong(TWEET_ID);
-            if (twId != null) {
-                retweetTweet(twId);
-            }
+            retweetTweet(twId);
         } else if (messageEvent.getPath().equals(OPEN_ON_DEVICE_PATH)) {
             Long twId = map.getLong(TWEET_ID);
-            if (twId != null) {
-                Intent intent = new Intent(getBaseContext(), TweetActivity.class);
-                intent.putExtra(TWEET_ID, twId);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                getApplication().startActivity(intent);
-            }
+            Intent intent = new Intent(getBaseContext(), TweetActivity.class);
+            intent.putExtra(TWEET_ID, twId);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            getApplication().startActivity(intent);
         }
 
 
@@ -144,18 +170,9 @@ public class TwearListenerService extends IntentService implements DataApi.DataL
         Callback<List<Tweet>> twCallback = new Callback<List<Tweet>>() {
             @Override
             public void success(Result<List<Tweet>> listResult) {
-                List<Tuit> tuits = new ArrayList<>();
                 if (listResult.data.size() > 0) {
                     for (Tweet tweet : listResult.data) {
-                        final PutDataMapRequest putRequest = PutDataMapRequest.create(TWEETS_DATA_ITEMS);
-                        DataMap map = putRequest.getDataMap();
-                        Tuit tuit = parseTuit(tweet);
-                        map.putString(TWEET_TEXT, tuit.getText());
-                        map.putString(TWEET_USERNAME, tuit.getUserName());
-                        map.putLong(TWEET_TIMESTAMP, tuit.getTimestamp());
-                        map.putLong(TWEET_ID, tuit.getId());
-                        map.putByteArray(TWEET_IMAGE, tuit.getImage());
-                        Wearable.DataApi.putDataItem(mGoogleApiClient, putRequest.asPutDataRequest());
+                        syncTweet(tweet);
                     }
                 } else {
                     final PutDataMapRequest putRequest = PutDataMapRequest.create(TWEETS_DATA_ITEMS_EMPTY);
@@ -202,7 +219,7 @@ public class TwearListenerService extends IntentService implements DataApi.DataL
         mTwClient.getStatusesService().retweet(idTweet, true, twCallback);
     }
 
-    private Tuit parseTuit(final Tweet tweet) {
+    private void syncTweet(final Tweet tweet) {
 
         String imageUrlString = null;
         if (tweet.entities.media != null && tweet.entities.media.size() > 0) {
@@ -215,20 +232,21 @@ public class TwearListenerService extends IntentService implements DataApi.DataL
             //TODO handle exception
             e.printStackTrace();
         }
-        final Tuit tuit = new Tuit();
         new BitmapLoadingTask() {
 
             @Override
             protected void onPostExecute(byte[] image) {
-                tuit.setText(tweet.text);
-                tuit.setUserName(tweet.user.name);
-                tuit.setTimestamp(TwearUtils.parseTwitterDate(tweet.createdAt).getTime());
-                tuit.setId(tweet.id);
-                tuit.setImage(image);
+                final PutDataMapRequest putRequest = PutDataMapRequest.create(TWEETS_DATA_ITEMS);
+                DataMap map = putRequest.getDataMap();
+                map.putString(TWEET_TEXT, tweet.text);
+                map.putString(TWEET_USERNAME, tweet.user.name);
+                map.putLong(TWEET_TIMESTAMP, TwearUtils.parseTwitterDate(tweet.createdAt).getTime());
+                map.putLong(TWEET_ID, tweet.id);
+                map.putByteArray(TWEET_IMAGE, image);
+                Wearable.DataApi.putDataItem(mGoogleApiClient, putRequest.asPutDataRequest());
 
             }
         }.execute(imageUrl);
-        return tuit;
     }
 
     private static void LOGD(final String tag, String message) {
@@ -236,18 +254,4 @@ public class TwearListenerService extends IntentService implements DataApi.DataL
     }
 
 
-    @Override
-    protected void onHandleIntent(Intent intent) {
-        LOGD(TAG, "onHandleIntent");
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .addApi(Wearable.API)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .build();
-
-        mTwSession = TwearSingleton.INSTANCE.getTwSession();
-        mTwClient = new TwitterApiClient(mTwSession);
-        mGoogleApiClient.connect();
-
-    }
 }
