@@ -6,12 +6,12 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/twear"
         android:label="@string/app_name"
         android:theme="@android:style/Theme.DeviceDefault">
 
         <activity
-            android:name=".TimeLineActivity"
+            android:name="onitsuma.com.twear.TimeLineActivity"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -21,7 +21,7 @@
         </activity>
         <activity
             android:name="android.support.wearable.activity.ConfirmationActivity"
-            android:theme="@style/TransparentTheme"></activity>
+            android:theme="@style/TransparentTheme"/>
 
         <meta-data
             android:name="io.fabric.ApiKey"

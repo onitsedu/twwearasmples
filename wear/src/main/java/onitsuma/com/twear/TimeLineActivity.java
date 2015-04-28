@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.WindowInsets;
 import android.widget.ProgressBar;
 
+import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.data.FreezableUtils;
@@ -28,6 +29,7 @@ import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.Wearable;
 
+import io.fabric.sdk.android.Fabric;
 import java.util.List;
 
 import onitsuma.com.twear.adapter.Row;
@@ -61,6 +63,7 @@ public class TimeLineActivity extends Activity implements GoogleApiClient.Connec
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Fabric.with(this, new Crashlytics());
         setContentView(R.layout.activity_time_line);
 
 

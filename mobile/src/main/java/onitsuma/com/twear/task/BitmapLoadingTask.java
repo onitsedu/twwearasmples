@@ -9,25 +9,23 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
-import onitsuma.com.twear.utils.TwearUtils;
-
 /**
  * Created by csuay on 10/04/15.
  */
-public class BitmapLoadingTask extends AsyncTask<URL, Void, byte[]> {
+public class BitmapLoadingTask extends AsyncTask<URL, Void, Bitmap> {
 
     @Override
-    protected byte[] doInBackground(URL... params) {
+    protected Bitmap doInBackground(URL... params) {
         if (params[0] == null) {
             return null;
         }
-        Bitmap bm = null;
+        Bitmap bm;
         try {
             bm = BitmapFactory.decodeStream((InputStream) params[0].getContent());
         } catch (IOException e) {
             Log.e("ERROR", "URL ERROR");
             return null;
         }
-        return TwearUtils.toByteArray(bm);
+        return bm;
     }
 }

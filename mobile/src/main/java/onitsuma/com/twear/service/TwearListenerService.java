@@ -51,7 +51,7 @@ import io.fabric.sdk.android.Fabric;
 import onitsuma.com.twear.activity.SignInActivity;
 import onitsuma.com.twear.activity.TweetActivity;
 import onitsuma.com.twear.singleton.TwearSingleton;
-import onitsuma.com.twear.task.BitmapLoadingTask;
+import onitsuma.com.twear.task.BytearrayLoadingTask;
 import onitsuma.com.twear.utils.TwearConstants;
 import onitsuma.com.twear.utils.TwearUtils;
 
@@ -232,7 +232,7 @@ public class TwearListenerService extends Service implements DataApi.DataListene
             //TODO handle exception
             e.printStackTrace();
         }
-        new BitmapLoadingTask() {
+        new BytearrayLoadingTask() {
 
             @Override
             protected void onPostExecute(byte[] image) {
