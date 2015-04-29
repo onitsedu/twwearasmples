@@ -1,12 +1,11 @@
 <resources>
     <string name="app_name">Twear</string>
-
+    <string name="app_description">Twitter Client for android Wear</string>
     <string name="action_settings">Settings</string>
-    <string name="title_activity_logged"></string>
-    <string name="logged_in_static">You\'re logged in as:</string>
+    <string name="logged_in_static">You\'re logged as:</string>
 
-    <string name="logout_settings">Logout</string>
-    <string name="title_activity_selector"></string>
-    <string name="title_activity_tweet"></string>
+
+    <string name="logout_button">Logout from Twitter</string>
+    <string name="ad_unit_id">/6253334/dfp_example_ad</string>
 
 </resources>

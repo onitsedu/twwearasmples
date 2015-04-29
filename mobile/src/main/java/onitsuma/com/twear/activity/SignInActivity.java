@@ -19,7 +19,7 @@ import onitsuma.com.twear.R;
 import onitsuma.com.twear.singleton.TwearSingleton;
 
 
-public class SignInActivity extends Activity {
+public class SignInActivity extends BaseTwearActivity {
 
     // Note: Your consumer key and secret should be obfuscated in your source code before shipping.
     public static final String TWITTER_KEY = "CrUzsu1kcZiL6NZstxRNRwHSv";
@@ -28,13 +28,13 @@ public class SignInActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         TwitterAuthConfig authConfig = new TwitterAuthConfig(TWITTER_KEY, TWITTER_SECRET);
         Fabric.with(this, new Twitter(authConfig), new Crashlytics(), new TweetUi());
 
         isTwConnected();
 
         setContentView(R.layout.activity_sign_in);
+        super.onCreate(savedInstanceState);
         loginButton = (TwitterLoginButton) findViewById(R.id.twitter_login_button);
         loginButton.setCallback(new Callback<TwitterSession>() {
             @Override

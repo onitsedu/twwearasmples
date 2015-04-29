@@ -19,7 +19,6 @@ package onitsuma.com.twear.adapter;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.Context;
-import android.graphics.Point;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.TransitionDrawable;
@@ -50,7 +49,6 @@ public class SampleGridPagerAdapter extends FragmentGridPagerAdapter {
     private final Context mContext;
     private ColorDrawable mDefaultBg;
 
-    private ColorDrawable mClearBg;
     private TwearWearableSingleton twSingleton;
 
 
@@ -58,7 +56,6 @@ public class SampleGridPagerAdapter extends FragmentGridPagerAdapter {
         super(fm);
         mContext = ctx;
         mDefaultBg = new ColorDrawable(R.color.dark_grey);
-        mClearBg = new ColorDrawable(android.R.color.transparent);
         twSingleton = TwearWearableSingleton.INSTANCE;
         if (twSingleton.getRowsMap() == null) {
             twSingleton.setRowsMap(new TreeMap<Long, TweetRow>(new TweetComparator()));
@@ -68,12 +65,11 @@ public class SampleGridPagerAdapter extends FragmentGridPagerAdapter {
 
     public void addRow(TweetRow row) {
         twSingleton.addRowsMap(row.getId(), row);
-//        twSingleton.addRow(row);
-//        Collections.sort(twSingleton.getRows(), new TweetRow());
 
     }
 
-    /*LruCache<Integer, Drawable> mRowBackgrounds = new LruCache<Integer, Drawable>(3) {
+
+    LruCache<Integer, Drawable> mRowBackgrounds = new LruCache<Integer, Drawable>(1) {
         @Override
         protected Drawable create(final Integer row) {
             int resid = BG_IMAGES[row % BG_IMAGES.length];
@@ -90,60 +86,12 @@ public class SampleGridPagerAdapter extends FragmentGridPagerAdapter {
                 }
             }.execute(resid);
             return mDefaultBg;
-        }
-    };*/
-
-
-    LruCache<Integer, Drawable> mRowBackgrounds = new LruCache<Integer, Drawable>(3) {
-        @Override
-        protected Drawable create(final Integer row) {
-            int resid = BG_IMAGES[row % BG_IMAGES.length];
-            new DrawableLoadingTask(mContext) {
-                @Override
-                protected void onPostExecute(Drawable result) {
-                    TransitionDrawable background = new TransitionDrawable(new Drawable[]{
-                            mDefaultBg,
-                            result
-                    });
-                    mRowBackgrounds.put(row, background);
-                    notifyRowBackgroundChanged(row);
-                    background.startTransition(TRANSITION_DURATION_MILLIS);
-                }
-            }.execute(resid);
-            return mDefaultBg;
-        }
-    };
-
-    LruCache<Point, Drawable> mPageBackgrounds = new LruCache<Point, Drawable>(3) {
-        @Override
-        protected Drawable create(final Point page) {
-            // place bugdroid as the background at row 2, column 1
-            if (page.y == 2 && page.x == 1) {
-                int resid = R.drawable.bugdroid_large;
-                new DrawableLoadingTask(mContext) {
-                    @Override
-                    protected void onPostExecute(Drawable result) {
-                        TransitionDrawable background = new TransitionDrawable(new Drawable[]{
-                                mClearBg,
-                                result
-                        });
-                        mPageBackgrounds.put(page, background);
-                        notifyPageBackgroundChanged(page.y, page.x);
-                        background.startTransition(TRANSITION_DURATION_MILLIS);
-                    }
-                }.execute(resid);
-            }
-            return GridPagerAdapter.BACKGROUND_NONE;
         }
     };
 
 
     static final int[] BG_IMAGES = new int[]{
-            R.drawable.debug_background_1,
-            R.drawable.debug_background_2,
-            R.drawable.debug_background_3,
-            R.drawable.debug_background_4,
-            R.drawable.debug_background_5
+            R.drawable.twbackground,
     };
 
     /**
@@ -160,24 +108,22 @@ public class SampleGridPagerAdapter extends FragmentGridPagerAdapter {
 
     @Override
     public Drawable getBackgroundForRow(final int row) {
-        return mRowBackgrounds.get(row % 4);
+        return mRowBackgrounds.get(0);
     }
 
     @Override
     public Drawable getBackgroundForPage(final int row, final int column) {
-        return mPageBackgrounds.get(new Point(column, row));
+        return GridPagerAdapter.BACKGROUND_NONE;
     }
 
     @Override
     public int getRowCount() {
         return twSingleton.getRowsMap().size();
-//        return twSingleton.getRows().size();
     }
 
     @Override
     public int getColumnCount(int rowNum) {
         return ((TweetRow) twSingleton.getRowsMap().values().toArray()[rowNum]).getTweetRow().getColumnCount();
-//        return twSingleton.getRows().get(rowNum).getTweetRow().getColumnCount();
     }
 
     class DrawableLoadingTask extends AsyncTask<Integer, Void, Drawable> {

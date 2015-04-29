@@ -2,46 +2,73 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="25dp"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin"
+    xmlns:ads="http://schemas.android.com/apk/res-auto"
+
+    android:background="@color/tw__blue_pressed"
     tools:context="com.example.csuay.twear.activity.LoggedActivity">
 
-    <TextView
-        android:textColor="@color/tw__tweet_action_color"
-        android:text="You're loged as"
-        android:layout_width="wrap_content"
+    <com.google.android.gms.ads.AdView
+        android:id="@+id/ad_view"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/textView"
-        android:textStyle="bold" />
-
-    <TextView
-        android:textColor="@color/tw__tweet_action_color"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Username"
-
-        android:id="@+id/logged_in_name"
-        android:layout_alignParentTop="true"
-        android:layout_toEndOf="@+id/textView"
-        android:paddingStart="5dp"
-        android:paddingBottom="10dp" />
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        ads:adSize="BANNER"
+        ads:adUnitId="@string/ad_unit_id" />
 
     <ImageView
         android:layout_width="fill_parent"
-        android:layout_height="140dp"
+        android:layout_height="190dp"
+
         android:id="@+id/backGroundView"
-        android:layout_below="@+id/textView"
-        android:layout_alignParentStart="true"
-        android:paddingTop="10dp" />
+        android:src="@color/tw__blue_default" />
 
-    <ImageView
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
+    <de.hdodenhof.circleimageview.CircleImageView xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/userImage"
-        android:layout_below="@+id/backGroundView"
-        android:layout_centerHorizontal="true" />
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        app:border_width="4dp"
+        android:src="@drawable/onit"
+        app:border_color="#FFFFFFFF"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="110dp"
+        android:layout_marginStart="25dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:paddingStart="20dp"
+        android:textStyle="bold"
+        android:textColor="@color/tw__solid_white"
+        android:id="@+id/logged_in_name"
+        android:layout_below="@+id/userImage"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/tw__solid_white"
+        android:layout_alignParentStart="true"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        android:paddingTop="10dp"
+        android:id="@+id/bioText"
+        android:layout_below="@+id/logged_in_name"
+        android:layout_alignStart="@+id/userImage" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@color/tw__blue_pressed_light"
+        android:textColor="@color/tw__blue_pressed"
+        android:text="@string/logout_button"
+        android:id="@+id/logoutButton"
+        android:padding="8dp"
+        android:textAllCaps="false"
+        android:layout_above="@+id/ad_view"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="25dp" />
 
 
 </RelativeLayout>

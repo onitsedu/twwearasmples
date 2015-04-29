@@ -4,7 +4,7 @@ import android.os.Bundle;
 
 import onitsuma.com.twear.R;
 
-public class SelectorActivity extends BaseActionBarActivity {
+public class SelectorActivity extends BaseTwearActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
