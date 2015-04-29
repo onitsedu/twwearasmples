@@ -102,10 +102,40 @@ public class TimeLineActivity extends Activity implements GoogleApiClient.Connec
         });
 
 
+
         pagerAdapter = new SampleGridPagerAdapter(this, getFragmentManager());
         pager.setAdapter(pagerAdapter);
+
+        pager.setOnPageChangeListener(new GridViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int row, int column, float rowOffset, float columnOffset, int rowOffsetPixels, int columnOffsetPixels) {
+
+
+                if (row == pagerAdapter.getRowCount() - 3 && rowOffset > 0.1f) {
+                    LOGD(TAG, "load more tweets");
+                    Long minId = null;
+                    if (TwearWearableSingleton.INSTANCE.getRowsMap() != null && TwearWearableSingleton.INSTANCE.getRowsMap().size() > 0) {
+                        minId = TwearWearableSingleton.INSTANCE.getRowsMap().lastKey();
+                    }
+                    new RequestTweetsActivityTask(10, null, minId).execute();
+                }
+
+            }
+
+            @Override
+            public void onPageSelected(int row, int column) {
+                LOGD(TAG, "this row = " + row + " Row Count " + pagerAdapter.getRowCount());
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+                LOGD(TAG, "onPageScrollStateChanged state " + state);
+            }
+        });
+
         DotsPageIndicator dotsPageIndicator = (DotsPageIndicator) findViewById(R.id.page_indicator);
         dotsPageIndicator.setPager(pager);
+
         requestTweets = true;
 
         refreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
@@ -115,7 +145,7 @@ public class TimeLineActivity extends Activity implements GoogleApiClient.Connec
                 LOGD(TAG, "refresh");
                 Long maxId = null;
                 if (TwearWearableSingleton.INSTANCE.getRowsMap() != null && TwearWearableSingleton.INSTANCE.getRowsMap().size() > 0) {
-                    maxId = TwearWearableSingleton.INSTANCE.getRowsMap().firstEntry().getKey();
+                    maxId = TwearWearableSingleton.INSTANCE.getRowsMap().firstKey();
                 }
                 new RequestTweetsActivityTask(10, maxId, null).execute();
             }

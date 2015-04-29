@@ -35,7 +35,7 @@ public class RequestTweetsActivityTask extends AsyncTask<Long, Void, Void> imple
 
     @Override
     protected Void doInBackground(Long... params) {
-        Log.d(TAG, "Requesting messages");
+        Log.d(TAG, "Requesting messages maxId" + mMaxId + " SinceId " + mSinceId);
         DataMap map = new DataMap();
         map.putInt(MESSAGE_OFFSET, mOffset);
         if (mMaxId != null) {

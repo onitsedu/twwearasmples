@@ -1,6 +1,5 @@
 package onitsuma.com.twear.activity;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -67,6 +66,7 @@ public class SignInActivity extends BaseTwearActivity {
             Intent intent = new Intent(getApplicationContext(), LoggedActivity.class);
             startActivity(intent);
         }
+        finish();
     }
 
     @Override
