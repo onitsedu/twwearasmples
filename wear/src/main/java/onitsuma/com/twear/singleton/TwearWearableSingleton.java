@@ -28,21 +28,6 @@ public enum TwearWearableSingleton {
         this.googleApiClient = googleApiClient;
     }
 
-//    public List<TweetRow> getRows() {
-//        return rows;
-//    }
-//
-//    public void setRows(List<TweetRow> rows) {
-//        this.rows = rows;
-//    }
-//
-//
-//    public void addRow(TweetRow row) {
-//        if (this.rows == null) {
-//            this.rows = new ArrayList<>();
-//        }
-//        this.rows.add(row);
-//    }
 
     public TreeMap<Long, TweetRow> getRowsMap() {
         return rowsMap;

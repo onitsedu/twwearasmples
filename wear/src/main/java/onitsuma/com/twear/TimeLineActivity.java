@@ -29,9 +29,9 @@ import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.Wearable;
 
-import io.fabric.sdk.android.Fabric;
 import java.util.List;
 
+import io.fabric.sdk.android.Fabric;
 import onitsuma.com.twear.adapter.Row;
 import onitsuma.com.twear.adapter.SampleGridPagerAdapter;
 import onitsuma.com.twear.fragment.FavouriteFragment;
@@ -75,6 +75,10 @@ public class TimeLineActivity extends Activity implements GoogleApiClient.Connec
 
         TwearWearableSingleton.INSTANCE.setGoogleApiClient(mGoogleApiClient);
         loading = (ProgressBar) findViewById(R.id.tweets_pb);
+        if (TwearWearableSingleton.INSTANCE.getRowsMap() == null || TwearWearableSingleton.INSTANCE.getRowsMap().size() == 0) {
+            loading.setVisibility(View.VISIBLE);
+        }
+
         final Resources res = getResources();
         final GridViewPager pager = (GridViewPager) findViewById(R.id.pager);
         pager.setOnApplyWindowInsetsListener(new View.OnApplyWindowInsetsListener() {
@@ -173,7 +177,7 @@ public class TimeLineActivity extends Activity implements GoogleApiClient.Connec
 
                 final DataMap map = DataMapItem.fromDataItem(event.getDataItem()).getDataMap();
 
-                dismissRefreshLoadingLayout(View.INVISIBLE);
+                dismissRefreshLoadingLayout();
                 Row row;
 
                 Bundle idBundle = new Bundle();
@@ -194,55 +198,24 @@ public class TimeLineActivity extends Activity implements GoogleApiClient.Connec
                 } else {
                     row = new Row(cardFragment(map.getString("user"), map.getString("text")), favFragment, rtwFragment, openOnDeviceFragment);
                 }
-                addNewRow(new TweetRow(map.getLong("id"), map.getLong("timestamp"), row));
+                addNewRow(new TweetRow(map.getLong("id"), row));
 
             } else if (TWEETS_DATA_ITEMS_EMPTY.equals(path)) {
-                dismissRefreshLoadingLayout(View.INVISIBLE);
+                dismissRefreshLoadingLayout();
 
             }
         }
 
     }
 
-    @Override
-    public void onMessageReceived(MessageEvent messageEvent) {
-        LOGD(TAG, "onMessageReceived: " + messageEvent);
-        DataMap map = DataMap.fromByteArray(messageEvent.getData());
-        if (messageEvent.getPath().equals(SEND_TWEETS_PATH)) {
-            dismissRefreshLoadingLayout(View.INVISIBLE);
-            Row row;
 
-            Bundle idBundle = new Bundle();
-            idBundle.putLong(TWEET_ID, map.getLong("id"));
-            Fragment favFragment = new FavouriteFragment();
-            favFragment.setArguments(idBundle);
-            Fragment rtwFragment = new RetweetFragment();
-            rtwFragment.setArguments(idBundle);
-            Fragment openOnDeviceFragment = new OpenOnDeviceFragment();
-            openOnDeviceFragment.setArguments(idBundle);
-
-            if (map.getByteArray("image") != null) {
-                FragmentImageView imageFragment = new FragmentImageView();
-                Bundle b = new Bundle();
-                b.putByteArray("image", map.getByteArray("image"));
-                imageFragment.setArguments(b);
-                row = new Row(cardFragment(map.getString("user"), map.getString("text")), imageFragment, favFragment, rtwFragment, openOnDeviceFragment);
-            } else {
-                row = new Row(cardFragment(map.getString("user"), map.getString("text")), favFragment, rtwFragment, openOnDeviceFragment);
-            }
-            addNewRow(new TweetRow(map.getLong("id"), map.getLong("timestamp"), row));
-
-        } else if (messageEvent.getPath().equals(SEND_NO_TWEETS_PATH)) {
-            dismissRefreshLoadingLayout(View.INVISIBLE);
-
-        }
-
-    }
-
-    private void dismissRefreshLoadingLayout(final int visibility) {
+    private void dismissRefreshLoadingLayout() {
         Runnable changeStatus = new Runnable() {
             @Override
             public void run() {
+                if (View.VISIBLE == loading.getVisibility()) {
+                    loading.setVisibility(View.INVISIBLE);
+                }
                 refreshLayout.setRefreshing(false);
             }
         };
@@ -275,4 +248,8 @@ public class TimeLineActivity extends Activity implements GoogleApiClient.Connec
     }
 
 
+    @Override
+    public void onMessageReceived(MessageEvent messageEvent) {
+        Log.d(TAG, "messageReceived");
+    }
 }

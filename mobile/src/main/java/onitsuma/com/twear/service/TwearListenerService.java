@@ -184,7 +184,7 @@ public class TwearListenerService extends Service implements DataApi.DataListene
             public void failure(TwitterException e) {
             }
         };
-        mTwClient.getStatusesService().homeTimeline(10, maxId, null, null, null, null, null, twCallback);
+        mTwClient.getStatusesService().homeTimeline(10, null, maxId, null, null, null, null, twCallback);
     }
 
 

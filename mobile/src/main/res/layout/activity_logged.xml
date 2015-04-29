@@ -39,6 +39,8 @@
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        android:paddingTop="20dp"
         android:textStyle="bold"
         android:textColor="@color/tw__solid_white"
         android:id="@+id/logged_in_name"
