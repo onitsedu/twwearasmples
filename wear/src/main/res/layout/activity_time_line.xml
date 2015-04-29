@@ -12,18 +12,9 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-<android.support.v4.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:background="@color/tw__blue_default"
-    android:layout_height="match_parent"
-    android:id="@+id/swipe_refresh_layout">
-
-
-    <android.support.wearable.view.GridViewPager
-        android:id="@+id/pager"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:keepScreenOn="true" />
+    android:layout_height="match_parent">
 
     <android.support.wearable.view.DotsPageIndicator
         android:id="@+id/page_indicator"
@@ -37,4 +28,20 @@
         android:layout_height="wrap_content"
         android:id="@+id/tweets_pb"
         android:layout_gravity="center" />
-</android.support.v4.widget.SwipeRefreshLayout>
+
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:layout_width="match_parent"
+        android:background="@color/tw__blue_default"
+        android:layout_height="match_parent"
+        android:id="@+id/swipe_refresh_layout">
+
+
+        <android.support.wearable.view.GridViewPager
+            android:id="@+id/pager"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:keepScreenOn="true" />
+
+
+    </android.support.v4.widget.SwipeRefreshLayout>
+</FrameLayout>

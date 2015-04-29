@@ -76,6 +76,7 @@ public class TimeLineActivity extends Activity implements GoogleApiClient.Connec
         TwearWearableSingleton.INSTANCE.setGoogleApiClient(mGoogleApiClient);
         loading = (ProgressBar) findViewById(R.id.tweets_pb);
         if (TwearWearableSingleton.INSTANCE.getRowsMap() == null || TwearWearableSingleton.INSTANCE.getRowsMap().size() == 0) {
+            Log.d(TAG, "loading...");
             loading.setVisibility(View.VISIBLE);
         }
 
@@ -102,15 +103,16 @@ public class TimeLineActivity extends Activity implements GoogleApiClient.Connec
         });
 
 
-
         pagerAdapter = new SampleGridPagerAdapter(this, getFragmentManager());
         pager.setAdapter(pagerAdapter);
-
+        DotsPageIndicator dotsPageIndicator = (DotsPageIndicator) findViewById(R.id.page_indicator);
+        dotsPageIndicator.setPager(pager);
+        requestTweets = true;
         pager.setOnPageChangeListener(new GridViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int row, int column, float rowOffset, float columnOffset, int rowOffsetPixels, int columnOffsetPixels) {
 
-
+                Log.d(TAG, "Page Scrolled " + pagerAdapter.getRowCount() + " row " + row);
                 if (row == pagerAdapter.getRowCount() - 3 && rowOffset > 0.1f) {
                     LOGD(TAG, "load more tweets");
                     Long minId = null;
@@ -133,8 +135,6 @@ public class TimeLineActivity extends Activity implements GoogleApiClient.Connec
             }
         });
 
-        DotsPageIndicator dotsPageIndicator = (DotsPageIndicator) findViewById(R.id.page_indicator);
-        dotsPageIndicator.setPager(pager);
 
         requestTweets = true;
 
@@ -161,8 +161,7 @@ public class TimeLineActivity extends Activity implements GoogleApiClient.Connec
         CardFragment fragment =
                 CardFragment.create(title, text, R.drawable.tw__ic_logo_blue);
         // Add some extra bottom margin to leave room for the page indicator
-        fragment.setCardMarginBottom(
-                res.getDimensionPixelSize(R.dimen.card_margin_bottom));
+        fragment.setCardMarginBottom(res.getDimensionPixelSize(R.dimen.card_margin_bottom));
         return fragment;
     }
 

@@ -102,7 +102,6 @@ public class SampleGridPagerAdapter extends FragmentGridPagerAdapter {
     @Override
     public Fragment getFragment(int row, int col) {
         Row adapterRow = ((TweetRow) twSingleton.getRowsMap().values().toArray()[row]).getTweetRow();
-//        Row adapterRow = twSingleton.getRows().get(row).getTweetRow();
         return adapterRow.getColumn(col);
     }
 

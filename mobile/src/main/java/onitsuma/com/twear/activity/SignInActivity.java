@@ -43,6 +43,7 @@ public class SignInActivity extends BaseTwearActivity {
 
                 Intent intent = new Intent(getApplicationContext(), LoggedActivity.class);
                 startActivity(intent);
+                finish();
 
             }
 
@@ -65,8 +66,8 @@ public class SignInActivity extends BaseTwearActivity {
             TwearSingleton.INSTANCE.setTwSession(twSession);
             Intent intent = new Intent(getApplicationContext(), LoggedActivity.class);
             startActivity(intent);
+            finish();
         }
-        finish();
     }
 
     @Override
