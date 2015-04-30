@@ -45,7 +45,7 @@ import onitsuma.com.twear.utils.TweetComparator;
  */
 public class SampleGridPagerAdapter extends FragmentGridPagerAdapter {
     private static final int TRANSITION_DURATION_MILLIS = 100;
-
+    String TAG = "gridPageAdapter";
     private final Context mContext;
     private ColorDrawable mDefaultBg;
 

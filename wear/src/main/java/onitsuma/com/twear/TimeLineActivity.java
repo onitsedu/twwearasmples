@@ -255,8 +255,11 @@ public class TimeLineActivity extends Activity implements GoogleApiClient.Connec
         Runnable addRowView = new Runnable() {
             @Override
             public void run() {
+                Log.d(TAG, "Adding new Row --Total Rows " + TwearWearableSingleton.INSTANCE.getRowsMap().size());
                 pagerAdapter.addRow(row);
                 pagerAdapter.notifyDataSetChanged();
+                Log.d(TAG, "New Row Added " + TwearWearableSingleton.INSTANCE.getRowsMap().size());
+
             }
         };
         runOnUiThread(addRowView);
