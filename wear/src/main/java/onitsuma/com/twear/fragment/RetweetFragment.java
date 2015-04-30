@@ -46,7 +46,7 @@ public class RetweetFragment extends Fragment implements TwearConstants, Delayed
                 Log.d(TAG, "Timer Clicked");
                 if (isAnimating) {
                     isAnimating = false;
-                    mDelayedConfirmationView.setImageResource(R.drawable.retweet);
+                    mDelayedConfirmationView.setImageResource(R.drawable.tw_rt_ed);
                     mDelayedConfirmationView.reset();
                     return;
                 }
@@ -75,7 +75,7 @@ public class RetweetFragment extends Fragment implements TwearConstants, Delayed
     @Override
     public void onTimerFinished(View v) {
         Log.d(TAG, "Timer Finished - > favorite tweet with ID ->" + mTweetId);
-        mDelayedConfirmationView.setImageResource(R.drawable.retweet);
+        mDelayedConfirmationView.setImageResource(R.drawable.tw_rt_ed);
         mDelayedConfirmationView.reset();
         Intent intent = new Intent(getActivity(), ConfirmationActivity.class);
         intent.putExtra(ConfirmationActivity.EXTRA_ANIMATION_TYPE,

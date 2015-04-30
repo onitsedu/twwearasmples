@@ -47,7 +47,7 @@ public class FavouriteFragment extends Fragment implements TwearConstants, Delay
                 Log.d(TAG, "Timer Clicked");
                 if (isAnimating) {
                     isAnimating = false;
-                    mDelayedConfirmationView.setImageResource(R.drawable.abc_btn_rating_star_off_mtrl_alpha);
+                    mDelayedConfirmationView.setImageResource(R.drawable.tw_favorite_ed);
                     mDelayedConfirmationView.reset();
                     Intent intent = new Intent(getActivity(), ConfirmationActivity.class);
                     intent.putExtra(ConfirmationActivity.EXTRA_ANIMATION_TYPE,
@@ -78,7 +78,7 @@ public class FavouriteFragment extends Fragment implements TwearConstants, Delay
     @Override
     public void onTimerFinished(View v) {
         Log.d(TAG, "Timer Finished - > favorite tweet with ID ->" + mTweetId);
-        mDelayedConfirmationView.setImageResource(R.drawable.abc_btn_rating_star_on_mtrl_alpha);
+        mDelayedConfirmationView.setImageResource(R.drawable.tw_favorite_ed);
         mDelayedConfirmationView.reset();
         Intent intent = new Intent(getActivity(), ConfirmationActivity.class);
         intent.putExtra(ConfirmationActivity.EXTRA_ANIMATION_TYPE,

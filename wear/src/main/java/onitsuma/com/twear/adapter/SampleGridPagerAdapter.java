@@ -68,6 +68,11 @@ public class SampleGridPagerAdapter extends FragmentGridPagerAdapter {
 
     }
 
+    public void deleteRow(Long rowId) {
+        twSingleton.getRowsMap().remove(rowId);
+
+    }
+
 
     LruCache<Integer, Drawable> mRowBackgrounds = new LruCache<Integer, Drawable>(1) {
         @Override

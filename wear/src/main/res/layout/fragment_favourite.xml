@@ -12,13 +12,13 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="center"
-            android:src="@drawable/abc_btn_rating_star_off_mtrl_alpha"
-            app:circle_color="@color/tw__blue_default"
+            android:src="@drawable/tw_favorite"
+            app:circle_color="@color/tw__solid_white"
             app:circle_radius="@dimen/circle_radius"
             app:circle_radius_pressed="@dimen/circle_radius_pressed"
             app:circle_padding="@dimen/circle_padding"
             app:circle_border_width="@dimen/circle_border_normal_width"
-            app:circle_border_color="@color/tw__light_gray" />
+            app:circle_border_color="@color/tw__blue_pressed" />
 
     </FrameLayout>
 </android.support.wearable.view.BoxInsetLayout>
