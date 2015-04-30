@@ -108,11 +108,11 @@ public class TimeLineActivity extends Activity implements GoogleApiClient.Connec
                 Log.d(TAG, "Page Scrolled " + pagerAdapter.getRowCount() + " row " + row);
                 if (row == pagerAdapter.getRowCount() - 3 && rowOffset > 0.1f) {
                     Log.d(TAG, "load more tweets");
-                    Long minId = null;
+                    Long maxId = null;
                     if (TwearWearableSingleton.INSTANCE.getRowsMap() != null && TwearWearableSingleton.INSTANCE.getRowsMap().size() > 0) {
-                        minId = TwearWearableSingleton.INSTANCE.getRowsMap().lastEntry().getKey();
+                        maxId = TwearWearableSingleton.INSTANCE.getRowsMap().lastEntry().getKey();
                     }
-                    new RequestTweetsActivityTask(10, null, minId).execute();
+                    new RequestTweetsActivityTask(10, null, maxId).execute();
                 }
 
             }
@@ -138,11 +138,11 @@ public class TimeLineActivity extends Activity implements GoogleApiClient.Connec
             @Override
             public void onRefresh() {
                 Log.d(TAG, "refresh");
-                Long maxId = null;
+                Long sinceId = null;
                 if (TwearWearableSingleton.INSTANCE.getRowsMap() != null && TwearWearableSingleton.INSTANCE.getRowsMap().size() > 0) {
-                    maxId = TwearWearableSingleton.INSTANCE.getRowsMap().firstEntry().getKey();
+                    sinceId = TwearWearableSingleton.INSTANCE.getRowsMap().firstEntry().getKey();
                 }
-                new RequestTweetsActivityTask(10, maxId, null).execute();
+                new RequestTweetsActivityTask(10, sinceId, null).execute();
             }
         });
 
@@ -195,7 +195,7 @@ public class TimeLineActivity extends Activity implements GoogleApiClient.Connec
     @Override
     public void onDataChanged(DataEventBuffer dataEvents) {
 
-        LOGD(TAG, "onDataChanged: " + dataEvents);
+        LOGD(TAG, "onDataChanged: " + dataEvents.getCount());
         if (TwearWearableSingleton.INSTANCE.getRowsMap().size() > 0 && TwearWearableSingleton.INSTANCE.getRowsMap().containsKey(LOADER_ID_VALUE)) {
             Log.d(TAG, "Removing Loader...");
             removeRow(LOADER_ID_VALUE);
@@ -208,7 +208,7 @@ public class TimeLineActivity extends Activity implements GoogleApiClient.Connec
             if (TWEETS_DATA_ITEMS.equals(path)) {
 
                 final DataMap map = DataMapItem.fromDataItem(event.getDataItem()).getDataMap();
-
+                Log.d(TAG, " " + map.getLong("id"));
                 dismissRefreshLoadingLayout();
                 Row row;
 

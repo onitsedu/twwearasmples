@@ -26,7 +26,7 @@ public class RequestTweetsActivityTask extends AsyncTask<Long, Void, Void> imple
     private Long mMaxId;
     private Long mSinceId;
 
-    public RequestTweetsActivityTask(Integer offset, Long maxId, Long sinceId) {
+    public RequestTweetsActivityTask(Integer offset, Long sinceId, Long maxId) {
         this.mGoogleApiClient = TwearWearableSingleton.INSTANCE.getGoogleApiClient();
         this.mOffset = offset;
         this.mMaxId = maxId;
@@ -35,7 +35,7 @@ public class RequestTweetsActivityTask extends AsyncTask<Long, Void, Void> imple
 
     @Override
     protected Void doInBackground(Long... params) {
-        Log.d(TAG, "Requesting messages maxId" + mMaxId + " SinceId " + mSinceId);
+        Log.d(TAG, "Requesting messages maxId " + mMaxId + " SinceId " + mSinceId);
         DataMap map = new DataMap();
         map.putInt(MESSAGE_OFFSET, mOffset);
         if (mMaxId != null) {
