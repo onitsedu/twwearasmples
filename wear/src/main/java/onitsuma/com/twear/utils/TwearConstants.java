@@ -5,6 +5,8 @@ package onitsuma.com.twear.utils;
  */
 public interface TwearConstants {
 
+    Long LOADER_ID_VALUE = 0L;
+
     String TWEET_IMAGE = "image";
     String TWEET_TEXT = "text";
     String TWEET_USERNAME = "user";

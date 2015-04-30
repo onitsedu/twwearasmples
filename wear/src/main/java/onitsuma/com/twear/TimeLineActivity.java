@@ -107,10 +107,10 @@ public class TimeLineActivity extends Activity implements GoogleApiClient.Connec
 
                 Log.d(TAG, "Page Scrolled " + pagerAdapter.getRowCount() + " row " + row);
                 if (row == pagerAdapter.getRowCount() - 3 && rowOffset > 0.1f) {
-                    LOGD(TAG, "load more tweets");
+                    Log.d(TAG, "load more tweets");
                     Long minId = null;
                     if (TwearWearableSingleton.INSTANCE.getRowsMap() != null && TwearWearableSingleton.INSTANCE.getRowsMap().size() > 0) {
-                        minId = TwearWearableSingleton.INSTANCE.getRowsMap().lastKey();
+                        minId = TwearWearableSingleton.INSTANCE.getRowsMap().lastEntry().getKey();
                     }
                     new RequestTweetsActivityTask(10, null, minId).execute();
                 }
@@ -137,17 +137,17 @@ public class TimeLineActivity extends Activity implements GoogleApiClient.Connec
         refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                LOGD(TAG, "refresh");
+                Log.d(TAG, "refresh");
                 Long maxId = null;
                 if (TwearWearableSingleton.INSTANCE.getRowsMap() != null && TwearWearableSingleton.INSTANCE.getRowsMap().size() > 0) {
-                    maxId = TwearWearableSingleton.INSTANCE.getRowsMap().firstKey();
+                    maxId = TwearWearableSingleton.INSTANCE.getRowsMap().firstEntry().getKey();
                 }
                 new RequestTweetsActivityTask(10, maxId, null).execute();
             }
         });
 
         if (TwearWearableSingleton.INSTANCE.getRowsMap() == null || TwearWearableSingleton.INSTANCE.getRowsMap().size() == 0) {
-            addNewRow(new TweetRow(Long.MIN_VALUE, new Row(new LoadingFragment())));
+            addNewRow(new TweetRow(LOADER_ID_VALUE, new Row(new LoadingFragment())));
         }
         mGoogleApiClient.connect();
     }
@@ -196,8 +196,9 @@ public class TimeLineActivity extends Activity implements GoogleApiClient.Connec
     public void onDataChanged(DataEventBuffer dataEvents) {
 
         LOGD(TAG, "onDataChanged: " + dataEvents);
-        if (TwearWearableSingleton.INSTANCE.getRowsMap().size() > 0) {
-            removeRow(Long.MAX_VALUE);
+        if (TwearWearableSingleton.INSTANCE.getRowsMap().size() > 0 && TwearWearableSingleton.INSTANCE.getRowsMap().containsKey(LOADER_ID_VALUE)) {
+            Log.d(TAG, "Removing Loader...");
+            removeRow(LOADER_ID_VALUE);
         }
 
         final List<DataEvent> events = FreezableUtils.freezeIterable(dataEvents);
