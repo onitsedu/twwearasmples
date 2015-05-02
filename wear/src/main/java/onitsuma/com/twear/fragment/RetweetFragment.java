@@ -46,19 +46,20 @@ public class RetweetFragment extends Fragment implements TwearConstants, Delayed
                 Log.d(TAG, "Timer Clicked");
                 if (isAnimating) {
                     isAnimating = false;
-                    mDelayedConfirmationView.setImageResource(R.drawable.tw_rt_ed);
+                    mDelayedConfirmationView.setImageResource(R.drawable.retweet_yellow);
                     mDelayedConfirmationView.reset();
                     return;
                 }
                 isAnimating = true;
                 mDelayedConfirmationView.setImageResource(R.drawable.ic_full_cancel);
                 mDelayedConfirmationView.setTotalTimeMs(NUM_SECONDS * 1000);
-                mDelayedConfirmationView.start();                    Intent intent = new Intent(getActivity(), ConfirmationActivity.class);
-                    intent.putExtra(ConfirmationActivity.EXTRA_ANIMATION_TYPE,
-                            ConfirmationActivity.FAILURE_ANIMATION);
-                    intent.putExtra(ConfirmationActivity.EXTRA_MESSAGE,
-                            getString(R.string.cancel_text));
-                    startActivity(intent);
+                mDelayedConfirmationView.start();
+                Intent intent = new Intent(getActivity(), ConfirmationActivity.class);
+                intent.putExtra(ConfirmationActivity.EXTRA_ANIMATION_TYPE,
+                        ConfirmationActivity.FAILURE_ANIMATION);
+                intent.putExtra(ConfirmationActivity.EXTRA_MESSAGE,
+                        getString(R.string.cancel_text));
+                startActivity(intent);
 
             }
         });
@@ -75,7 +76,7 @@ public class RetweetFragment extends Fragment implements TwearConstants, Delayed
     @Override
     public void onTimerFinished(View v) {
         Log.d(TAG, "Timer Finished - > favorite tweet with ID ->" + mTweetId);
-        mDelayedConfirmationView.setImageResource(R.drawable.tw_rt_ed);
+        mDelayedConfirmationView.setImageResource(R.drawable.retweet_yellow);
         mDelayedConfirmationView.reset();
         Intent intent = new Intent(getActivity(), ConfirmationActivity.class);
         intent.putExtra(ConfirmationActivity.EXTRA_ANIMATION_TYPE,

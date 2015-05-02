@@ -7,6 +7,8 @@ public interface TwearConstants {
 
     Long LOADER_ID_VALUE = 0L;
 
+    Integer TWEETS_REQUEST_SIZE = 30;
+
     String TWEET_IMAGE = "image";
     String TWEET_TEXT = "text";
     String TWEET_USERNAME = "user";

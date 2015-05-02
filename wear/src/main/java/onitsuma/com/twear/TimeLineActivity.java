@@ -59,6 +59,8 @@ public class TimeLineActivity extends Activity implements GoogleApiClient.Connec
 
     private boolean requestTweets;
 
+    private boolean requestMoreTimeline;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -98,21 +100,26 @@ public class TimeLineActivity extends Activity implements GoogleApiClient.Connec
         });
 
 
+
+
         pagerAdapter = new SampleGridPagerAdapter(this, getFragmentManager());
         pager.setAdapter(pagerAdapter);
-
+        DotsPageIndicator dotsPageIndicator = (DotsPageIndicator) findViewById(R.id.page_indicator);
+        dotsPageIndicator.setPager(pager);
+        requestMoreTimeline = true;
         pager.setOnPageChangeListener(new GridViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int row, int column, float rowOffset, float columnOffset, int rowOffsetPixels, int columnOffsetPixels) {
 
                 Log.d(TAG, "Page Scrolled " + pagerAdapter.getRowCount() + " row " + row);
-                if (row == pagerAdapter.getRowCount() - 3 && rowOffset > 0.1f) {
+                if (row == pagerAdapter.getRowCount() - 1 && rowOffset > 0.1f && requestMoreTimeline) {
                     Log.d(TAG, "load more tweets");
                     Long maxId = null;
                     if (TwearWearableSingleton.INSTANCE.getRowsMap() != null && TwearWearableSingleton.INSTANCE.getRowsMap().size() > 0) {
                         maxId = TwearWearableSingleton.INSTANCE.getRowsMap().lastEntry().getKey();
                     }
-                    new RequestTweetsActivityTask(10, null, maxId).execute();
+                    new RequestTweetsActivityTask(TWEETS_REQUEST_SIZE, null, maxId).execute();
+                    requestMoreTimeline = false;
                 }
 
             }
@@ -128,8 +135,6 @@ public class TimeLineActivity extends Activity implements GoogleApiClient.Connec
             }
         });
 
-        DotsPageIndicator dotsPageIndicator = (DotsPageIndicator) findViewById(R.id.page_indicator);
-        dotsPageIndicator.setPager(pager);
 
         requestTweets = true;
 
@@ -142,7 +147,7 @@ public class TimeLineActivity extends Activity implements GoogleApiClient.Connec
                 if (TwearWearableSingleton.INSTANCE.getRowsMap() != null && TwearWearableSingleton.INSTANCE.getRowsMap().size() > 0) {
                     sinceId = TwearWearableSingleton.INSTANCE.getRowsMap().firstEntry().getKey();
                 }
-                new RequestTweetsActivityTask(10, sinceId, null).execute();
+                new RequestTweetsActivityTask(TWEETS_REQUEST_SIZE, sinceId, null).execute();
             }
         });
 
@@ -177,7 +182,7 @@ public class TimeLineActivity extends Activity implements GoogleApiClient.Connec
         Wearable.NodeApi.addListener(mGoogleApiClient, this);
         if (requestTweets) {
             requestTweets = false;
-            new RequestTweetsActivityTask(10, null, null).execute();
+            new RequestTweetsActivityTask(TWEETS_REQUEST_SIZE, null, null).execute();
         }
     }
 
@@ -206,7 +211,7 @@ public class TimeLineActivity extends Activity implements GoogleApiClient.Connec
             final Uri uri = event.getDataItem().getUri();
             final String path = uri != null ? uri.getPath() : null;
             if (TWEETS_DATA_ITEMS.equals(path)) {
-
+                requestMoreTimeline = true;
                 final DataMap map = DataMapItem.fromDataItem(event.getDataItem()).getDataMap();
                 Log.d(TAG, " " + map.getLong("id"));
                 dismissRefreshLoadingLayout();

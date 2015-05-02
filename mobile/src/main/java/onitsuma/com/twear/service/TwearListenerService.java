@@ -131,7 +131,8 @@ public class TwearListenerService extends Service implements DataApi.DataListene
         if (messageEvent.getPath().equals(RETRIEVE_TWEETS_PATH)) {
             Long maxId = map.getLong(MESSAGE_MAX_ID) != 0 ? map.getLong(MESSAGE_MAX_ID) : null;
             Long sinceId = map.getLong(MESSAGE_SINCE_ID) != 0 ? map.getLong(MESSAGE_SINCE_ID) : null;
-            sendTweetsToWearable(maxId, sinceId);
+            Integer numTweets = map.getInt(MESSAGE_OFFSET) != 0 ? map.getInt(MESSAGE_OFFSET) : null;
+            sendTweetsToWearable(numTweets, maxId, sinceId);
         } else if (messageEvent.getPath().equals(FAVOURITE_TWEET_PATH)) {
             Long twId = map.getLong(TWEET_ID);
             favouriteTweet(twId);
@@ -167,7 +168,7 @@ public class TwearListenerService extends Service implements DataApi.DataListene
     }
 
 
-    private void sendTweetsToWearable(Long maxId, Long sinceId) {
+    private void sendTweetsToWearable(Integer numTweets, Long maxId, Long sinceId) {
         Callback<List<Tweet>> twCallback = new Callback<List<Tweet>>() {
             @Override
             public void success(Result<List<Tweet>> listResult) {
@@ -185,7 +186,7 @@ public class TwearListenerService extends Service implements DataApi.DataListene
             public void failure(TwitterException e) {
             }
         };
-        mTwClient.getStatusesService().homeTimeline(10, sinceId, maxId, null, null, null, null, twCallback);
+        mTwClient.getStatusesService().homeTimeline(numTweets, sinceId, maxId, null, null, null, null, twCallback);
     }
 
 
@@ -230,8 +231,7 @@ public class TwearListenerService extends Service implements DataApi.DataListene
         try {
             imageUrl = imageUrlString != null ? new URL(imageUrlString) : null;
         } catch (MalformedURLException e) {
-            //TODO handle exception
-            e.printStackTrace();
+            Log.e(TAG, e.getMessage());
         }
         new BytearrayLoadingTask() {
 
