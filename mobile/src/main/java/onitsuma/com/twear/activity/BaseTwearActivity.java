@@ -16,9 +16,13 @@ import onitsuma.com.twear.singleton.TwearSingleton;
 /**
  * Created by onitsuma on 24/04/15.
  */
-public class BaseTwearActivity extends Activity {
+public abstract class BaseTwearActivity extends Activity {
 
 
+    public abstract String getInterstitialUnitId();
+
+
+    private String TAG = "BaseACtv";
     private InterstitialAd mInterstitialAd;
 
     protected AdRequest adRequest;
@@ -28,7 +32,7 @@ public class BaseTwearActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         AdRequest.Builder adRequestBuilder = new AdRequest.Builder();
-        adRequestBuilder.addTestDevice("D4B2114AC7CECA6FBA795D0C2AEFA520");
+        // adRequestBuilder.addTestDevice("D4B2114AC7CECA6FBA795D0C2AEFA520");
         adRequest = adRequestBuilder.build();
         // Start loading the ad in the background.
         mAdView = (AdView) findViewById(R.id.ad_view);
@@ -37,8 +41,7 @@ public class BaseTwearActivity extends Activity {
         /*InterstitialAd*/
         mInterstitialAd = new InterstitialAd(this);
 
-        //TODO put in strings
-        mInterstitialAd.setAdUnitId("ca-app-pub-3940256099942544/6300978111");
+        mInterstitialAd.setAdUnitId(getInterstitialUnitId());
 
         // Create an ad request.
 

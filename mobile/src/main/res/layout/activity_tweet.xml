@@ -39,6 +39,6 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         ads:adSize="BANNER"
-        ads:adUnitId="@string/ad_unit_id"
+        ads:adUnitId="@string/tweet_banner"
         android:layout_gravity="center_horizontal|bottom" />
 </RelativeLayout>

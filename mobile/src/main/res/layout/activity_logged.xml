@@ -14,7 +14,7 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         ads:adSize="BANNER"
-        ads:adUnitId="@string/ad_unit_id" />
+        ads:adUnitId="@string/logged_banner" />
 
     <ImageView
         android:layout_width="fill_parent"
@@ -28,7 +28,6 @@
         android:layout_width="120dp"
         android:layout_height="120dp"
         app:border_width="4dp"
-        android:src="@drawable/onit"
         app:border_color="#FFFFFFFF"
         android:layout_alignParentTop="true"
         android:layout_marginTop="110dp"

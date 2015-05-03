@@ -64,7 +64,7 @@ public class SampleGridPagerAdapter extends FragmentGridPagerAdapter {
 
 
     public void addRow(TweetRow row) {
-        twSingleton.addRowsMap(row.getId(), row);
+        twSingleton.addRowsMap(row.getTimestamp(), row);
 
     }
 

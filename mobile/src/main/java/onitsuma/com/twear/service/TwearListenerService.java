@@ -244,6 +244,7 @@ public class TwearListenerService extends Service implements DataApi.DataListene
                 map.putLong(TWEET_TIMESTAMP, TwearUtils.parseTwitterDate(tweet.createdAt).getTime());
                 map.putLong(TWEET_ID, tweet.id);
                 map.putByteArray(TWEET_IMAGE, image);
+                map.putString(TWEET_DATE, tweet.createdAt);
                 Wearable.DataApi.putDataItem(mGoogleApiClient, putRequest.asPutDataRequest());
 
             }

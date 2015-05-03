@@ -7,7 +7,6 @@
     tools:context=".SignInActivity">
 
 
-
     <com.google.android.gms.ads.AdView
         android:id="@+id/ad_view"
         android:layout_width="match_parent"
@@ -16,7 +15,7 @@
         android:layout_centerHorizontal="true"
         android:paddingBottom="5dp"
         ads:adSize="BANNER"
-        ads:adUnitId="@string/ad_unit_id" />
+        ads:adUnitId="@string/signin_banner" />
 
     <com.twitter.sdk.android.core.identity.TwitterLoginButton
         android:id="@+id/twitter_login_button"

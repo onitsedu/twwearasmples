@@ -54,6 +54,11 @@ public class LoggedActivity extends BaseTwearActivity {
 
 
     @Override
+    public String getInterstitialUnitId() {
+        return getString(R.string.logged_interstitial);
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         setContentView(R.layout.activity_logged);
         super.onCreate(savedInstanceState);

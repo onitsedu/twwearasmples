@@ -10,21 +10,24 @@ public class TweetRow {
 
     private Long id;
 
+    private Long timestamp;
+
     private Row tweetRow;
 
     public TweetRow() {
 
     }
 
-    public TweetRow(Long id, Row row) {
+    public TweetRow(Long timestamp, Long id, Row row) {
         this.tweetRow = row;
         this.id = id;
+        this.timestamp = timestamp;
     }
-
 
     public Row getTweetRow() {
         return tweetRow;
     }
+
 
     public void setTweetRow(Row tweetRow) {
         this.tweetRow = tweetRow;
@@ -36,5 +39,13 @@ public class TweetRow {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Long getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(Long timestamp) {
+        this.timestamp = timestamp;
     }
 }

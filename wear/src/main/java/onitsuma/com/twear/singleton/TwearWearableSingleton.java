@@ -37,10 +37,10 @@ public enum TwearWearableSingleton {
         this.rowsMap = rowsMap;
     }
 
-    public void addRowsMap(Long id, TweetRow row) {
+    public void addRowsMap(Long timestamp, TweetRow row) {
         if (this.rowsMap == null) {
             this.rowsMap = new TreeMap<>(new TweetComparator());
         }
-        this.rowsMap.put(id, row);
+        this.rowsMap.put(timestamp, row);
     }
 }

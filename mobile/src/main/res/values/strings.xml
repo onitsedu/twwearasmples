@@ -7,5 +7,14 @@
 
     <string name="logout_button">Logout from Twitter</string>
     <string name="ad_unit_id">/6253334/dfp_example_ad</string>
+    <string name="admob_id">pub-3013615396667638</string>
+
+    <string name="signin_banner">ca-app-pub-3013615396667638/5106405502</string>
+    <string name="logged_banner">ca-app-pub-3013615396667638/1873737502</string>
+    <string name="tweet_banner">ca-app-pub-3013615396667638/4827203907</string>
+
+    <string name="signin_interstitial">ca-app-pub-3013615396667638/9536605108</string>
+    <string name="logged_interstitial">ca-app-pub-3013615396667638/6303937103</string>
+    <string name="tweet_interstitial">ca-app-pub-3013615396667638/7780670304</string>
 
 </resources>

@@ -1,10 +1,11 @@
 package onitsuma.com.twear.activity;
 
+import android.app.Activity;
 import android.os.Bundle;
 
 import onitsuma.com.twear.R;
 
-public class SelectorActivity extends BaseTwearActivity {
+public class SelectorActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

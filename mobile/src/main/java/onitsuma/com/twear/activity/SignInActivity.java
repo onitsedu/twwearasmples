@@ -25,6 +25,12 @@ public class SignInActivity extends BaseTwearActivity {
     public static final String TWITTER_SECRET = "04aMc1DwPNTlPFMMr4cKjWKuzYJHUzKuFkhGyOcCuJp3gklfnT";
     private TwitterLoginButton loginButton;
 
+
+    @Override
+    public String getInterstitialUnitId() {
+        return getString(R.string.signin_interstitial);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         TwitterAuthConfig authConfig = new TwitterAuthConfig(TWITTER_KEY, TWITTER_SECRET);

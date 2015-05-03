@@ -10,6 +10,7 @@ public interface TwearConstants {
     String TWEET_USERNAME = "user";
     String TWEET_ID = "id";
     String TWEET_TIMESTAMP = "timestamp";
+    String TWEET_DATE = "date";
 
     String START_ACTIVITY_PATH = "/start-activity-twear";
     String RETRIEVE_TWEETS_PATH = "/twear-retrieve-tweets";

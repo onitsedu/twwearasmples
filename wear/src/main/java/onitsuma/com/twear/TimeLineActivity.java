@@ -100,8 +100,6 @@ public class TimeLineActivity extends Activity implements GoogleApiClient.Connec
         });
 
 
-
-
         pagerAdapter = new SampleGridPagerAdapter(this, getFragmentManager());
         pager.setAdapter(pagerAdapter);
         DotsPageIndicator dotsPageIndicator = (DotsPageIndicator) findViewById(R.id.page_indicator);
@@ -116,7 +114,7 @@ public class TimeLineActivity extends Activity implements GoogleApiClient.Connec
                     Log.d(TAG, "load more tweets");
                     Long maxId = null;
                     if (TwearWearableSingleton.INSTANCE.getRowsMap() != null && TwearWearableSingleton.INSTANCE.getRowsMap().size() > 0) {
-                        maxId = TwearWearableSingleton.INSTANCE.getRowsMap().lastEntry().getKey();
+                        maxId = TwearWearableSingleton.INSTANCE.getRowsMap().lastEntry().getValue().getId();
                     }
                     new RequestTweetsActivityTask(TWEETS_REQUEST_SIZE, null, maxId).execute();
                     requestMoreTimeline = false;
@@ -145,14 +143,14 @@ public class TimeLineActivity extends Activity implements GoogleApiClient.Connec
                 Log.d(TAG, "refresh");
                 Long sinceId = null;
                 if (TwearWearableSingleton.INSTANCE.getRowsMap() != null && TwearWearableSingleton.INSTANCE.getRowsMap().size() > 0) {
-                    sinceId = TwearWearableSingleton.INSTANCE.getRowsMap().firstEntry().getKey();
+                    sinceId = TwearWearableSingleton.INSTANCE.getRowsMap().firstEntry().getValue().getId();
                 }
                 new RequestTweetsActivityTask(TWEETS_REQUEST_SIZE, sinceId, null).execute();
             }
         });
 
         if (TwearWearableSingleton.INSTANCE.getRowsMap() == null || TwearWearableSingleton.INSTANCE.getRowsMap().size() == 0) {
-            addNewRow(new TweetRow(LOADER_ID_VALUE, new Row(new LoadingFragment())));
+            addNewRow(new TweetRow(LOADER_ID_VALUE, 0L, new Row(new LoadingFragment())));
         }
         mGoogleApiClient.connect();
     }
@@ -226,16 +224,18 @@ public class TimeLineActivity extends Activity implements GoogleApiClient.Connec
                 Fragment openOnDeviceFragment = new OpenOnDeviceFragment();
                 openOnDeviceFragment.setArguments(idBundle);
 
-                if (map.getByteArray("image") != null) {
+                if (map.getByteArray(TWEET_IMAGE) != null) {
                     FragmentImageView imageFragment = new FragmentImageView();
                     Bundle b = new Bundle();
-                    b.putByteArray("image", map.getByteArray("image"));
+                    b.putByteArray(TWEET_IMAGE, map.getByteArray(TWEET_IMAGE));
                     imageFragment.setArguments(b);
-                    row = new Row(cardFragment(map.getString("user"), map.getString("text")), imageFragment, favFragment, rtwFragment, openOnDeviceFragment);
+                    //   row = new Row(cardFragment("" + map.getLong(TWEET_TIMESTAMP), map.getString(TWEET_DATE)), imageFragment, favFragment, rtwFragment, openOnDeviceFragment);
+                    row = new Row(cardFragment(map.getString(TWEET_USERNAME), map.getString(TWEET_TEXT)), imageFragment, favFragment, rtwFragment, openOnDeviceFragment);
                 } else {
-                    row = new Row(cardFragment(map.getString("user"), map.getString("text")), favFragment, rtwFragment, openOnDeviceFragment);
+                    // row = new Row(cardFragment("" + map.getLong(TWEET_TIMESTAMP), map.getString(TWEET_DATE)), favFragment, rtwFragment, openOnDeviceFragment);
+                    row = new Row(cardFragment(map.getString(TWEET_USERNAME), map.getString(TWEET_TEXT)), favFragment, rtwFragment, openOnDeviceFragment);
                 }
-                addNewRow(new TweetRow(map.getLong("id"), row));
+                addNewRow(new TweetRow(map.getLong(TWEET_TIMESTAMP), map.getLong(TWEET_ID), row));
 
             } else if (TWEETS_DATA_ITEMS_EMPTY.equals(path)) {
                 dismissRefreshLoadingLayout();

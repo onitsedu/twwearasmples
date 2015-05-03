@@ -1,6 +1,7 @@
 package onitsuma.com.twear.utils;
 
 import android.graphics.Bitmap;
+import android.util.Log;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -14,6 +15,7 @@ import java.util.Locale;
  */
 public class TwearUtils {
     static final String TWITTER = "EEE MMM dd HH:mm:ss ZZZZZ yyyy";
+    private static final String TAG = "TWUTILS";
 
     public static Date parseTwitterDate(String date) {
         SimpleDateFormat sf = new SimpleDateFormat(TWITTER, Locale.ENGLISH);
@@ -22,6 +24,7 @@ public class TwearUtils {
         try {
             ret = sf.parse(date);
         } catch (ParseException e) {
+            Log.e(TAG, e.getMessage());
             return new Date();
         }
         return ret;

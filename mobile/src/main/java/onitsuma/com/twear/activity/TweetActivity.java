@@ -19,6 +19,12 @@ public class TweetActivity extends BaseTwearActivity implements TwearConstants {
 
     private FrameLayout tweetLayout;
 
+
+    @Override
+    public String getInterstitialUnitId() {
+        return getString(R.string.tweet_interstitial);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setContentView(R.layout.activity_tweet);
