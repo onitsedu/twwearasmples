@@ -31,6 +31,7 @@ import onitsuma.com.twear.service.TwearListenerService;
 import onitsuma.com.twear.singleton.TwearSingleton;
 import onitsuma.com.twear.task.BitmapLoadingTask;
 import onitsuma.com.twear.twitter.CustomTwitterApiClient;
+import onitsuma.com.twear.utils.AppRater;
 
 public class LoggedActivity extends BaseTwearActivity {
 
@@ -62,6 +63,8 @@ public class LoggedActivity extends BaseTwearActivity {
     protected void onCreate(Bundle savedInstanceState) {
         setContentView(R.layout.activity_logged);
         super.onCreate(savedInstanceState);
+
+        AppRater.showRateDialog(this, null);
 
         mContext = this;
         twSession = TwearSingleton.INSTANCE.getTwSession();

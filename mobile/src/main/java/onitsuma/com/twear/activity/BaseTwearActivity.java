@@ -8,9 +8,11 @@ import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.InterstitialAd;
+import com.google.android.gms.analytics.GoogleAnalytics;
 import com.twitter.sdk.android.Twitter;
 
 import onitsuma.com.twear.R;
+import onitsuma.com.twear.analytics.TwearApplication;
 import onitsuma.com.twear.singleton.TwearSingleton;
 
 /**
@@ -38,6 +40,11 @@ public abstract class BaseTwearActivity extends Activity {
         mAdView = (AdView) findViewById(R.id.ad_view);
         mAdView.loadAd(adRequest);
 
+        /*Analytics*/
+
+
+        ((TwearApplication) getApplication()).getTracker(TwearApplication.TrackerName.APP_TRACKER);
+
         /*InterstitialAd*/
         mInterstitialAd = new InterstitialAd(this);
 
@@ -63,6 +70,18 @@ public abstract class BaseTwearActivity extends Activity {
         mInterstitialAd.loadAd(adRequestBuilder.build());
 
 
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        GoogleAnalytics.getInstance(this).reportActivityStart(this);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        GoogleAnalytics.getInstance(this).reportActivityStop(this);
     }
 
     protected void logout() {
