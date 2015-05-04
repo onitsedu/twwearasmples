@@ -22,10 +22,10 @@ android {
 
     defaultConfig {
         applicationId "onitsuma.com.twear"
-        minSdkVersion 20
+        minSdkVersion 19
         targetSdkVersion 21
-        versionCode 1
-        versionName "1.0"
+        versionCode 2
+        versionName "1.1"
     }
     buildTypes {
         release {
