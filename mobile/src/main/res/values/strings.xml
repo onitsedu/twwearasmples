@@ -17,4 +17,9 @@
     <string name="logged_interstitial">ca-app-pub-3013615396667638/6303937103</string>
     <string name="tweet_interstitial">ca-app-pub-3013615396667638/7780670304</string>
 
+    <string name="rate_text">Take a moment to rate this app, thanks for your support!</string>
+    <string name="rate_title">Rate Twear App</string>
+    <string name="rate_later">Remind later</string>
+    <string name="rate_no">No thanks</string>
+
 </resources>

@@ -55,6 +55,7 @@ public class AppRater {
         final Dialog dialog = new Dialog(mContext);
 
         dialog.setContentView(R.layout.rate_dialog);
+        dialog.setTitle("Rate Twear App");
 
         RatingBar rating = (RatingBar) dialog.findViewById(R.id.ratingBar);
 

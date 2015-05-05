@@ -7,6 +7,11 @@
         <item name="android:textColorPrimary">@color/tw__solid_white</item>
         <item name="android:windowBackground">@color/tw__solid_white</item>
         <item name="android:navigationBarColor">@color/tw__blue_pressed</item>
+        <item name="android:dialogTheme">@style/CustomDialogTheme</item>
+    </style>
+
+    <style name="CustomDialogTheme" parent="Theme.AppCompat.Light.Dialog">
+        <item name="@android:textColor">@color/tw__blue_pressed</item>
     </style>
 
 </resources>
