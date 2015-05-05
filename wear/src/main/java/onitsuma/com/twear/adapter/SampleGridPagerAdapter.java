@@ -127,7 +127,11 @@ public class SampleGridPagerAdapter extends FragmentGridPagerAdapter {
 
     @Override
     public int getColumnCount(int rowNum) {
-        return ((TweetRow) twSingleton.getRowsMap().values().toArray()[rowNum]).getTweetRow().getColumnCount();
+        if (rowNum > twSingleton.getRowsMap().values().toArray().length) {
+            return 1;
+        } else {
+            return ((TweetRow) twSingleton.getRowsMap().values().toArray()[rowNum]).getTweetRow().getColumnCount();
+        }
     }
 
     class DrawableLoadingTask extends AsyncTask<Integer, Void, Drawable> {

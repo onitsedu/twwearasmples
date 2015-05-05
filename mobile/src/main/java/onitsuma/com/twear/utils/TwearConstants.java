@@ -22,6 +22,7 @@ public interface TwearConstants {
 
     String TWEETS_DATA_ITEMS = "/tweet-data-item-twear";
     String TWEETS_DATA_ITEMS_EMPTY = "/tweet-data-item-empty-twear";
+    String TWEETS_NOT_LOGGED = "/tweet-not-logged-empty-twear";
 
 
     String ACTION_SEND_TWEETS = "send_tweets";

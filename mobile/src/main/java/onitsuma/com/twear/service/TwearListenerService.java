@@ -37,7 +37,6 @@ import com.google.android.gms.wearable.Wearable;
 import com.twitter.sdk.android.Twitter;
 import com.twitter.sdk.android.core.Callback;
 import com.twitter.sdk.android.core.Result;
-import com.twitter.sdk.android.core.TwitterApiClient;
 import com.twitter.sdk.android.core.TwitterAuthConfig;
 import com.twitter.sdk.android.core.TwitterException;
 import com.twitter.sdk.android.core.TwitterSession;
@@ -52,6 +51,7 @@ import onitsuma.com.twear.activity.SignInActivity;
 import onitsuma.com.twear.activity.TweetActivity;
 import onitsuma.com.twear.singleton.TwearSingleton;
 import onitsuma.com.twear.task.BytearrayLoadingTask;
+import onitsuma.com.twear.task.SendMessageAsyncTask;
 import onitsuma.com.twear.utils.TwearConstants;
 import onitsuma.com.twear.utils.TwearUtils;
 
@@ -67,8 +67,6 @@ public class TwearListenerService extends Service implements DataApi.DataListene
 
 
     private GoogleApiClient mGoogleApiClient;
-    private TwitterSession mTwSession;
-    private TwitterApiClient mTwClient;
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -82,8 +80,7 @@ public class TwearListenerService extends Service implements DataApi.DataListene
         TwitterAuthConfig authConfig = new TwitterAuthConfig(SignInActivity.TWITTER_KEY, SignInActivity.TWITTER_SECRET);
         Fabric.with(this, new Twitter(authConfig), new Crashlytics());
         isTwConnected();
-        mTwSession = TwearSingleton.INSTANCE.getTwSession();
-        mTwClient = new TwitterApiClient(mTwSession);
+
         mGoogleApiClient.connect();
         return START_STICKY;
     }
@@ -127,8 +124,11 @@ public class TwearListenerService extends Service implements DataApi.DataListene
     public void onMessageReceived(MessageEvent messageEvent) {
         LOGD(TAG, "onMessageReceived() A message from watch was received:" + messageEvent
                 .getRequestId() + " " + messageEvent.getPath());
+
         DataMap map = DataMap.fromByteArray(messageEvent.getData());
-        if (messageEvent.getPath().equals(RETRIEVE_TWEETS_PATH)) {
+        if (TwearSingleton.INSTANCE.getTwSession() == null || TwearSingleton.INSTANCE.getTwClient() == null) {
+            sendNotLoggedAlert();
+        } else if (messageEvent.getPath().equals(RETRIEVE_TWEETS_PATH)) {
             Long maxId = map.getLong(MESSAGE_MAX_ID) != 0 ? map.getLong(MESSAGE_MAX_ID) : null;
             Long sinceId = map.getLong(MESSAGE_SINCE_ID) != 0 ? map.getLong(MESSAGE_SINCE_ID) : null;
             Integer numTweets = map.getInt(MESSAGE_OFFSET) != 0 ? map.getInt(MESSAGE_OFFSET) : null;
@@ -167,6 +167,10 @@ public class TwearListenerService extends Service implements DataApi.DataListene
         Wearable.NodeApi.removeListener(mGoogleApiClient, this);
     }
 
+    private void sendNotLoggedAlert() {
+        new SendMessageAsyncTask(mGoogleApiClient).execute();
+    }
+
 
     private void sendTweetsToWearable(Integer numTweets, Long maxId, Long sinceId) {
         Callback<List<Tweet>> twCallback = new Callback<List<Tweet>>() {
@@ -186,7 +190,7 @@ public class TwearListenerService extends Service implements DataApi.DataListene
             public void failure(TwitterException e) {
             }
         };
-        mTwClient.getStatusesService().homeTimeline(numTweets, sinceId, maxId, null, null, null, null, twCallback);
+        TwearSingleton.INSTANCE.getTwClient().getStatusesService().homeTimeline(numTweets, sinceId, maxId, null, null, null, null, twCallback);
     }
 
 
@@ -203,7 +207,7 @@ public class TwearListenerService extends Service implements DataApi.DataListene
             }
         };
 
-        mTwClient.getFavoriteService().create(idTweet, true, twCallback);
+        TwearSingleton.INSTANCE.getTwClient().getFavoriteService().create(idTweet, true, twCallback);
     }
 
     private void retweetTweet(Long idTweet) {
@@ -218,7 +222,7 @@ public class TwearListenerService extends Service implements DataApi.DataListene
                 //FAILING FAVORITE
             }
         };
-        mTwClient.getStatusesService().retweet(idTweet, true, twCallback);
+        TwearSingleton.INSTANCE.getTwClient().getStatusesService().retweet(idTweet, true, twCallback);
     }
 
     private void syncTweet(final Tweet tweet) {

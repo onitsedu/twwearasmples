@@ -29,6 +29,7 @@ import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.Wearable;
 
 import java.util.List;
+import java.util.TreeMap;
 
 import io.fabric.sdk.android.Fabric;
 import onitsuma.com.twear.adapter.Row;
@@ -42,6 +43,7 @@ import onitsuma.com.twear.model.TweetRow;
 import onitsuma.com.twear.singleton.TwearWearableSingleton;
 import onitsuma.com.twear.task.RequestTweetsActivityTask;
 import onitsuma.com.twear.utils.TwearConstants;
+import onitsuma.com.twear.utils.TweetComparator;
 
 public class TimeLineActivity extends Activity implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, DataApi.DataListener, MessageApi.MessageListener,
@@ -109,7 +111,6 @@ public class TimeLineActivity extends Activity implements GoogleApiClient.Connec
             @Override
             public void onPageScrolled(int row, int column, float rowOffset, float columnOffset, int rowOffsetPixels, int columnOffsetPixels) {
 
-                Log.d(TAG, "Page Scrolled " + pagerAdapter.getRowCount() + " row " + row);
                 if (row == pagerAdapter.getRowCount() - 1 && rowOffset > 0.1f && requestMoreTimeline) {
                     Log.d(TAG, "load more tweets");
                     Long maxId = null;
@@ -124,12 +125,10 @@ public class TimeLineActivity extends Activity implements GoogleApiClient.Connec
 
             @Override
             public void onPageSelected(int row, int column) {
-                Log.d(TAG, "this row = " + row + " Row Count " + pagerAdapter.getRowCount());
             }
 
             @Override
             public void onPageScrollStateChanged(int state) {
-                Log.d(TAG, "onPageScrollStateChanged state " + state);
             }
         });
 
@@ -157,10 +156,13 @@ public class TimeLineActivity extends Activity implements GoogleApiClient.Connec
 
 
     private Fragment cardFragment(String title, String text) {
+        return cardFragment(title, text, R.drawable.tw__ic_logo_blue);
+    }
+
+    private Fragment cardFragment(String title, String text, int rid) {
         Resources res = this.getResources();
         CardFragment fragment =
-                CardFragment.create(title, text, R.drawable.tw__ic_logo_blue);
-        // Add some extra bottom margin to leave room for the page indicator
+                CardFragment.create(title, text, rid);
         fragment.setCardMarginBottom(res.getDimensionPixelSize(R.dimen.card_margin_bottom));
         return fragment;
     }
@@ -202,6 +204,11 @@ public class TimeLineActivity extends Activity implements GoogleApiClient.Connec
         if (TwearWearableSingleton.INSTANCE.getRowsMap().size() > 0 && TwearWearableSingleton.INSTANCE.getRowsMap().containsKey(LOADER_ID_VALUE)) {
             Log.d(TAG, "Removing Loader...");
             removeRow(LOADER_ID_VALUE);
+
+        }
+        if (TwearWearableSingleton.INSTANCE.getRowsMap().containsKey(ERROR_ID_VALUE)) {
+            Log.d(TAG, "Removing error card...");
+            reinitRows();
         }
 
         final List<DataEvent> events = FreezableUtils.freezeIterable(dataEvents);
@@ -281,6 +288,17 @@ public class TimeLineActivity extends Activity implements GoogleApiClient.Connec
         runOnUiThread(addRowView);
     }
 
+    private void reinitRows() {
+        Runnable reinitRow = new Runnable() {
+            @Override
+            public void run() {
+                TwearWearableSingleton.INSTANCE.setRowsMap(new TreeMap<Long, TweetRow>(new TweetComparator()));
+                pagerAdapter.notifyDataSetChanged();
+            }
+        };
+        runOnUiThread(reinitRow);
+    }
+
     public void onPeerConnected(Node peer) {
         LOGD(TAG, "onPeerConnected: " + peer);
     }
@@ -296,6 +314,12 @@ public class TimeLineActivity extends Activity implements GoogleApiClient.Connec
 
     @Override
     public void onMessageReceived(MessageEvent messageEvent) {
-        Log.d(TAG, "messageReceived");
+        Log.d(TAG, "messageReceived " + messageEvent);
+        if (TWEETS_NOT_LOGGED.equals(messageEvent.getPath())) {
+            dismissRefreshLoadingLayout();
+            reinitRows();
+            addNewRow(new TweetRow(ERROR_ID_VALUE, 0L, new Row(cardFragment(getString(R.string.not_logged_title), getString(R.string.not_logged_text), R.drawable.error))));
+
+        }
     }
 }

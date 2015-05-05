@@ -11,6 +11,7 @@ import com.twitter.sdk.android.tweetui.TweetUtils;
 import com.twitter.sdk.android.tweetui.TweetView;
 
 import onitsuma.com.twear.R;
+import onitsuma.com.twear.utils.AppRater;
 import onitsuma.com.twear.utils.TwearConstants;
 
 public class TweetActivity extends BaseTwearActivity implements TwearConstants {
@@ -29,6 +30,8 @@ public class TweetActivity extends BaseTwearActivity implements TwearConstants {
     protected void onCreate(Bundle savedInstanceState) {
         setContentView(R.layout.activity_tweet);
         super.onCreate(savedInstanceState);
+        AppRater.app_launched(this);
+
         tweetLayout = (FrameLayout) findViewById(R.id.tweet_layout);
         mActivityContext = this;
         Long twId = (Long) getIntent().getExtras().get(TWEET_ID);

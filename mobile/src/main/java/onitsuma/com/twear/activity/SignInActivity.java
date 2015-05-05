@@ -7,6 +7,7 @@ import com.crashlytics.android.Crashlytics;
 import com.twitter.sdk.android.Twitter;
 import com.twitter.sdk.android.core.Callback;
 import com.twitter.sdk.android.core.Result;
+import com.twitter.sdk.android.core.TwitterApiClient;
 import com.twitter.sdk.android.core.TwitterAuthConfig;
 import com.twitter.sdk.android.core.TwitterException;
 import com.twitter.sdk.android.core.TwitterSession;
@@ -15,6 +16,7 @@ import com.twitter.sdk.android.tweetui.TweetUi;
 
 import io.fabric.sdk.android.Fabric;
 import onitsuma.com.twear.R;
+import onitsuma.com.twear.service.TwearListenerService;
 import onitsuma.com.twear.singleton.TwearSingleton;
 
 
@@ -35,6 +37,10 @@ public class SignInActivity extends BaseTwearActivity {
     protected void onCreate(Bundle savedInstanceState) {
         TwitterAuthConfig authConfig = new TwitterAuthConfig(TWITTER_KEY, TWITTER_SECRET);
         Fabric.with(this, new Twitter(authConfig), new Crashlytics(), new TweetUi());
+
+
+        Intent intent = new Intent(this, TwearListenerService.class);
+        startService(intent);
 
         isTwConnected();
 
@@ -70,6 +76,7 @@ public class SignInActivity extends BaseTwearActivity {
         TwitterSession twSession = Twitter.getSessionManager().getActiveSession();
         if (twSession != null) {
             TwearSingleton.INSTANCE.setTwSession(twSession);
+            TwearSingleton.INSTANCE.setTwClient(new TwitterApiClient(twSession));
             Intent intent = new Intent(getApplicationContext(), LoggedActivity.class);
             startActivity(intent);
             finish();

@@ -43,7 +43,7 @@
     <string name="open_on_phone_text">Tweet opened</string>
     <string name="cancel_text">Action cancelled</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="not_logged_title">Error</string>
+    <string name="not_logged_text">You must be logged in twitter in the mobile app in order to see your time line, please open the smartphone, app log in with twitter, and pull to refresh your timeline</string>
 
 </resources>

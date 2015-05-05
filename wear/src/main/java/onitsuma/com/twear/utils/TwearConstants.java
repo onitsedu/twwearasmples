@@ -5,7 +5,10 @@ package onitsuma.com.twear.utils;
  */
 public interface TwearConstants {
 
+
     Long LOADER_ID_VALUE = 0L;
+    Long ERROR_ID_VALUE = 1L;
+
 
     Integer TWEETS_REQUEST_SIZE = 30;
 
@@ -27,6 +30,7 @@ public interface TwearConstants {
 
     String TWEETS_DATA_ITEMS = "/tweet-data-item-twear";
     String TWEETS_DATA_ITEMS_EMPTY = "/tweet-data-item-empty-twear";
+    String TWEETS_NOT_LOGGED = "/tweet-not-logged-empty-twear";
 
 
     String MESSAGE_OFFSET = "offset";

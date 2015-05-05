@@ -27,7 +27,6 @@ import java.util.TreeMap;
 
 import onitsuma.com.twear.R;
 import onitsuma.com.twear.model.Tuit;
-import onitsuma.com.twear.service.TwearListenerService;
 import onitsuma.com.twear.singleton.TwearSingleton;
 import onitsuma.com.twear.task.BitmapLoadingTask;
 import onitsuma.com.twear.twitter.CustomTwitterApiClient;
@@ -64,7 +63,7 @@ public class LoggedActivity extends BaseTwearActivity {
         setContentView(R.layout.activity_logged);
         super.onCreate(savedInstanceState);
 
-        AppRater.showRateDialog(this, null);
+        AppRater.app_launched(this);
 
         mContext = this;
         twSession = TwearSingleton.INSTANCE.getTwSession();
@@ -154,12 +153,6 @@ public class LoggedActivity extends BaseTwearActivity {
 
             }
         });
-
-
-        /* Init service*/
-
-        Intent intent = new Intent(this, TwearListenerService.class);
-        startService(intent);
 
     }
 
