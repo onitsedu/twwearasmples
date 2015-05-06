@@ -36,6 +36,8 @@ public class TweetActivity extends BaseTwearActivity implements TwearConstants {
         mActivityContext = this;
         Long twId = (Long) getIntent().getExtras().get(TWEET_ID);
 
+        AppRater.app_launched(this);
+
         TweetUtils.loadTweet(twId, new LoadCallback<Tweet>() {
             @Override
             public void success(Tweet tweet) {

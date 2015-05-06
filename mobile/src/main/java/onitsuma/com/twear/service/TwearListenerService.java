@@ -44,6 +44,7 @@ import com.twitter.sdk.android.core.models.Tweet;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 
 import io.fabric.sdk.android.Fabric;
@@ -177,9 +178,10 @@ public class TwearListenerService extends Service implements DataApi.DataListene
             @Override
             public void success(Result<List<Tweet>> listResult) {
                 if (listResult.data.size() > 0) {
-                    for (Tweet tweet : listResult.data) {
-                        syncTweet(tweet);
-                    }
+                    syncTweetsArray(listResult.data);
+//                    for (Tweet tweet : listResult.data) {
+//                        syncTweet(tweet);
+//                    }
                 } else {
                     final PutDataMapRequest putRequest = PutDataMapRequest.create(TWEETS_DATA_ITEMS_EMPTY);
                     Wearable.DataApi.putDataItem(mGoogleApiClient, putRequest.asPutDataRequest());
@@ -223,6 +225,23 @@ public class TwearListenerService extends Service implements DataApi.DataListene
             }
         };
         TwearSingleton.INSTANCE.getTwClient().getStatusesService().retweet(idTweet, true, twCallback);
+    }
+
+    private void syncTweetsArray(List<Tweet> tuits) {
+        final PutDataMapRequest putRequest = PutDataMapRequest.create(TWEETS_DATA_ITEMS);
+        DataMap map = putRequest.getDataMap();
+        ArrayList<DataMap> listMap = new ArrayList<>();
+        for (Tweet tweet : tuits) {
+            DataMap tuitMap = new DataMap();
+            tuitMap.putString(TWEET_TEXT, tweet.text);
+            tuitMap.putString(TWEET_USERNAME, tweet.user.name);
+            tuitMap.putLong(TWEET_TIMESTAMP, TwearUtils.parseTwitterDate(tweet.createdAt).getTime());
+            tuitMap.putLong(TWEET_ID, tweet.id);
+            tuitMap.putString(TWEET_DATE, tweet.createdAt);
+            listMap.add(tuitMap);
+        }
+        map.putDataMapArrayList("tweets", listMap);
+        Wearable.DataApi.putDataItem(mGoogleApiClient, putRequest.asPutDataRequest());
     }
 
     private void syncTweet(final Tweet tweet) {

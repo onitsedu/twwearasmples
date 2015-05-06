@@ -28,6 +28,7 @@ import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.Wearable;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
 
@@ -217,33 +218,32 @@ public class TimeLineActivity extends Activity implements GoogleApiClient.Connec
             final String path = uri != null ? uri.getPath() : null;
             if (TWEETS_DATA_ITEMS.equals(path)) {
                 requestMoreTimeline = true;
-                final DataMap map = DataMapItem.fromDataItem(event.getDataItem()).getDataMap();
-                Log.d(TAG, " " + map.getLong("id"));
-                dismissRefreshLoadingLayout();
-                Row row;
+                final DataMap rootMap = DataMapItem.fromDataItem(event.getDataItem()).getDataMap();
+                ArrayList<DataMap> mapArray = rootMap.getDataMapArrayList("tweets");
+                for (DataMap map : mapArray) {
+                    Log.d(TAG, " " + map.getLong("id"));
+                    dismissRefreshLoadingLayout();
+                    Row row;
+                    Bundle idBundle = new Bundle();
+                    idBundle.putLong(TWEET_ID, map.getLong("id"));
+                    Fragment favFragment = new FavouriteFragment();
+                    favFragment.setArguments(idBundle);
+                    Fragment rtwFragment = new RetweetFragment();
+                    rtwFragment.setArguments(idBundle);
+                    Fragment openOnDeviceFragment = new OpenOnDeviceFragment();
+                    openOnDeviceFragment.setArguments(idBundle);
 
-                Bundle idBundle = new Bundle();
-                idBundle.putLong(TWEET_ID, map.getLong("id"));
-                Fragment favFragment = new FavouriteFragment();
-                favFragment.setArguments(idBundle);
-                Fragment rtwFragment = new RetweetFragment();
-                rtwFragment.setArguments(idBundle);
-                Fragment openOnDeviceFragment = new OpenOnDeviceFragment();
-                openOnDeviceFragment.setArguments(idBundle);
-
-                if (map.getByteArray(TWEET_IMAGE) != null) {
-                    FragmentImageView imageFragment = new FragmentImageView();
-                    Bundle b = new Bundle();
-                    b.putByteArray(TWEET_IMAGE, map.getByteArray(TWEET_IMAGE));
-                    imageFragment.setArguments(b);
-                    //   row = new Row(cardFragment("" + map.getLong(TWEET_TIMESTAMP), map.getString(TWEET_DATE)), imageFragment, favFragment, rtwFragment, openOnDeviceFragment);
-                    row = new Row(cardFragment(map.getString(TWEET_USERNAME), map.getString(TWEET_TEXT)), imageFragment, favFragment, rtwFragment, openOnDeviceFragment);
-                } else {
-                    // row = new Row(cardFragment("" + map.getLong(TWEET_TIMESTAMP), map.getString(TWEET_DATE)), favFragment, rtwFragment, openOnDeviceFragment);
-                    row = new Row(cardFragment(map.getString(TWEET_USERNAME), map.getString(TWEET_TEXT)), favFragment, rtwFragment, openOnDeviceFragment);
+                    if (map.getByteArray(TWEET_IMAGE) != null) {
+                        FragmentImageView imageFragment = new FragmentImageView();
+                        Bundle b = new Bundle();
+                        b.putByteArray(TWEET_IMAGE, map.getByteArray(TWEET_IMAGE));
+                        imageFragment.setArguments(b);
+                        row = new Row(cardFragment(map.getString(TWEET_USERNAME), map.getString(TWEET_TEXT)), imageFragment, favFragment, rtwFragment, openOnDeviceFragment);
+                    } else {
+                        row = new Row(cardFragment(map.getString(TWEET_USERNAME), map.getString(TWEET_TEXT)), favFragment, rtwFragment, openOnDeviceFragment);
+                    }
+                    addNewRow(new TweetRow(map.getLong(TWEET_TIMESTAMP), map.getLong(TWEET_ID), row));
                 }
-                addNewRow(new TweetRow(map.getLong(TWEET_TIMESTAMP), map.getLong(TWEET_ID), row));
-
             } else if (TWEETS_DATA_ITEMS_EMPTY.equals(path)) {
                 dismissRefreshLoadingLayout();
 

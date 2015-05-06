@@ -12,7 +12,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="center"
-            android:src="@drawable/common_full_open_on_phone"
             app:circle_color="@color/tw__blue_pressed"
             app:circle_radius="@dimen/circle_radius"
             app:circle_radius_pressed="@dimen/circle_radius_pressed"
