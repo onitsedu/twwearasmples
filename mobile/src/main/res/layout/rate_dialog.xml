@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:paddingStart="25dp"
+    android:paddingEnd="25dp"
+
+    android:layout_height="wrap_content"
+    android:paddingBottom="40dp">
+
+    <RatingBar
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/ratingBar"
+        android:layout_marginTop="140dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="@color/tw__blue_default"
+        android:text="@string/rate_text"
+        android:layout_alignEnd="@+id/ratingBar"
+        android:id="@+id/textView3"
+        android:padding="5dp"
+        android:layout_marginBottom="62dp"
+        android:layout_alignBottom="@+id/ratingBar"
+        android:layout_alignStart="@+id/ratingBar" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/tw__blue_pressed"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="@string/rate_title"
+        android:id="@+id/textView4"
+        android:layout_above="@+id/textView3"
+        android:layout_alignStart="@+id/textView3"
+        android:padding="5dp" />
+
+    <Button
+        android:background="@color/tw__blue_pressed"
+        android:textColor="@color/tw__blue_pressed_light"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/rate_later"
+        android:layout_marginTop="20dp"
+        android:id="@+id/later_button"
+        android:layout_below="@+id/ratingBar"
+        android:layout_alignStart="@+id/ratingBar"
+        android:padding="10dp" />
+
+    <Button
+        android:background="@color/tw__blue_pressed"
+        android:layout_marginTop="20dp"
+        android:text="@string/rate_no"
+        android:textColor="@color/tw__blue_pressed_light"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/no_thanks_button"
+        android:layout_below="@+id/ratingBar"
+        android:layout_alignEnd="@+id/ratingBar"
+        android:padding="10dp" />
+</RelativeLayout>

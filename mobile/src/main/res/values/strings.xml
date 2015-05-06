@@ -1,8 +1,25 @@
 <resources>
     <string name="app_name">Twear</string>
-
-    <string name="hello_world">Hello world!</string>
+    <string name="app_description">Twitter client for Android Wear</string>
     <string name="action_settings">Settings</string>
-    <string name="title_activity_logged">LoggedActivity</string>
-    <string name="logged_in_static">You\'re logged in as:</string>
+    <string name="logged_in_static">You\'re logged as:</string>
+
+
+    <string name="logout_button">Logout from Twitter</string>
+    <string name="ad_unit_id">/6253334/dfp_example_ad</string>
+    <string name="admob_id">pub-3013615396667638</string>
+
+    <string name="signin_banner">ca-app-pub-3013615396667638/5106405502</string>
+    <string name="logged_banner">ca-app-pub-3013615396667638/1873737502</string>
+    <string name="tweet_banner">ca-app-pub-3013615396667638/4827203907</string>
+
+    <string name="signin_interstitial">ca-app-pub-3013615396667638/9536605108</string>
+    <string name="logged_interstitial">ca-app-pub-3013615396667638/6303937103</string>
+    <string name="tweet_interstitial">ca-app-pub-3013615396667638/7780670304</string>
+
+    <string name="rate_text">Take a moment to rate this app, thanks for your support!</string>
+    <string name="rate_title">Rate Twear App</string>
+    <string name="rate_later">Remind later</string>
+    <string name="rate_no">No thanks</string>
+
 </resources>

@@ -1,84 +1,195 @@
 package onitsuma.com.twear.activity;
 
-import android.graphics.Color;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.widget.LinearLayout;
+import android.os.IBinder;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.twitter.sdk.android.core.Callback;
 import com.twitter.sdk.android.core.Result;
-import com.twitter.sdk.android.core.TwitterApiClient;
 import com.twitter.sdk.android.core.TwitterException;
 import com.twitter.sdk.android.core.TwitterSession;
-import com.twitter.sdk.android.core.models.Tweet;
+import com.twitter.sdk.android.core.models.User;
 
-import java.util.List;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.TreeMap;
 
 import onitsuma.com.twear.R;
+import onitsuma.com.twear.model.Tuit;
 import onitsuma.com.twear.singleton.TwearSingleton;
+import onitsuma.com.twear.task.BitmapLoadingTask;
+import onitsuma.com.twear.twitter.CustomTwitterApiClient;
+import onitsuma.com.twear.utils.AppRater;
 
-public class LoggedActivity extends ActionBarActivity {
+public class LoggedActivity extends BaseTwearActivity {
 
+
+    private String userName;
     private TextView loggedName;
+    private TextView bioText;
 
-    private LinearLayout timelineLayout;
+    private Button logoutButton;
+
 
     private TwitterSession twSession;
 
+    private String TAG = "LoggedActivity";
+
+    private SwipeRefreshLayout refreshLayout;
+
+    private ImageView backGroundView;
+    private ImageView userImageView;
+    private Context mContext;
+
+
+    @Override
+    public String getInterstitialUnitId() {
+        return getString(R.string.logged_interstitial);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_logged);
+        super.onCreate(savedInstanceState);
+
+        AppRater.app_launched(this);
+
+        mContext = this;
         twSession = TwearSingleton.INSTANCE.getTwSession();
         loggedName = (TextView) findViewById(R.id.logged_in_name);
-        loggedName.setText("  " + twSession.getUserName());
-
-        timelineLayout = (LinearLayout) findViewById(R.id.timelineLayout);
-
-        Callback<List<Tweet>> callbackTweets = new Callback<List<Tweet>>() {
+        loggedName.setText("@" + twSession.getUserName());
+        userName = twSession.getUserName();
+        bioText = (TextView) findViewById(R.id.bioText);
+        logoutButton = (Button) findViewById(R.id.logoutButton);
+        logoutButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void success(Result<List<Tweet>> listResult) {
-                TextView tweet = null;
-                for (Tweet tuit : listResult.data) {
-                    tweet = new TextView(getApplicationContext());
-                    tweet.setText(tuit.text + "\n");
-                    tweet.setTextColor(Color.parseColor("#000000"));
-                    timelineLayout.addView(tweet);
+            public void onClick(View v) {
+                logout();
+            }
+        });
+
+
+        CustomTwitterApiClient mTwClient = new CustomTwitterApiClient(twSession);
+        TreeMap<Long, Tuit> tuitsMap = new TreeMap<>(new Tuit());
+        TwearSingleton.INSTANCE.setTuitsMap(tuitsMap);
+        TwearSingleton.INSTANCE.setTwClient(mTwClient);
+        backGroundView = (ImageView) findViewById(R.id.backGroundView);
+        userImageView = (ImageView) findViewById(R.id.userImage);
+
+        backGroundView.setOnClickListener(profileClick);
+        userImageView.setOnClickListener(profileClick);
+
+
+        mTwClient.getUserProfileService().show(twSession.getUserId(), new Callback<User>() {
+            @Override
+            public void success(Result<User> userResult) {
+
+                bioText.setText(userResult.data.description);
+                if (userResult.data.profileBannerUrl != null) {
+
+
+                    URL backgroundUrl = null;
+                    try {
+                        backgroundUrl = new URL(userResult.data.profileBannerUrl);
+                    } catch (MalformedURLException e) {
+                        e.printStackTrace();
+                    }
+                    new BitmapLoadingTask() {
+
+                        @Override
+                        protected void onPostExecute(final Bitmap image) {
+
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    backGroundView.setImageBitmap(image);
+                                }
+                            });
+
+
+                        }
+
+                    }.execute(backgroundUrl);
                 }
+                URL userUrl = null;
+                String userStringUrl = userResult.data.profileImageUrl.replace("_normal", "");
+                try {
+                    userUrl = new URL(userStringUrl);
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                }
+                new BitmapLoadingTask() {
+
+                    @Override
+                    protected void onPostExecute(final Bitmap image) {
+
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                userImageView.setImageBitmap(image);
+                            }
+                        });
+
+
+                    }
+
+                }.execute(userUrl);
+
             }
 
             @Override
             public void failure(TwitterException e) {
 
             }
-        };
-        TwitterApiClient twClient = new TwitterApiClient(twSession);
-        twClient.getStatusesService().homeTimeline(50, null, null, null, null, null, null, callbackTweets);
+        });
+
     }
 
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_logged, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+    protected ServiceConnection mServerConn = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder binder) {
+            Log.d(TAG, "onServiceConnected");
         }
 
-        return super.onOptionsItemSelected(item);
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            Log.d(TAG, "onServiceDisconnected");
+        }
+    };
+
+    private View.OnClickListener profileClick = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            openTwitterProfile();
+        }
+    };
+
+    private void openTwitterProfile() {
+        Intent intent = null;
+        try {
+            // get the Twitter app if possible
+            this.getPackageManager().getPackageInfo("com.twitter.android", 0);
+            intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://twitter.com/" + userName));
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        } catch (Exception e) {
+            // no Twitter app, revert to browser
+        }
+        this.startActivity(intent);
+    }
+
+    private static void LOGD(final String tag, String message) {
+        Log.d(tag, message);
     }
 }
